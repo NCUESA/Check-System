@@ -23,9 +23,9 @@ class AuthMiddleware
 
 
         if (!$isAllowed) {
-            return redirect()->to('/');
+            return abort(403, '您沒有權限訪問該頁面');
         }
-        session(['hasAccess' => true]);
+        
         
         return $next($request);
     }

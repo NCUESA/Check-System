@@ -7,6 +7,10 @@ use App\Models\Person;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
+const LOCATION_ALLOWANCE_JINDE = 120;
+const LOCATION_ALLOWANCE_BOASAN = 30;
+const LOCATION_ALLOWANCE_OTHER = 0;
+
 class JobController extends Controller
 {
     //
@@ -45,9 +49,9 @@ class JobController extends Controller
                 'checkin_time' => $check_time->format('Y-m-d H:i'),
                 'checkin_ip' => $clientIp,
                 'checkin_operation' => 1
-
             ]);
             return response()->json(['success' => true, 'name' => $check_person->name, 'message' => '簽到成功', 'checkIP' => $clientIp], 200);
+            
         } else {
             $checkin_time = Carbon::parse($user_exist->checkin_time);
 
@@ -143,9 +147,9 @@ class JobController extends Controller
         );
 
         $locationAllowances = [
-            'jinde' => 120,
-            'baosan' => 30,
-            'manual' => 0,
+            'jinde' => LOCATION_ALLOWANCE_JINDE,
+            'baosan' => LOCATION_ALLOWANCE_BOASAN,
+            'manual' => LOCATION_ALLOWANCE_OTHER,
         ];
 
         $data = CheckList::join('person', 'checklist.inner_code', '=', 'person.inner_code')

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\AuthIp;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -21,9 +22,14 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         //
-        View::composer('template', function ($view) {
-            $hasAccess = session('hasAccess', false);
-            $view->with(compact('hasAccess'));
+        View::composer('*', function ($view) {
+            $clientIp = request()->ip();
+            $isAllowed = AuthIp::where('ip_address', $clientIp)
+                ->first();
+    
+            $hasAccess = $isAllowed;
+    
+            $view->with(compact('clientIp', 'hasAccess'));
         });
     }
 }

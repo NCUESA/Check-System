@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('index', ['js_name' => 'index']);
 });
+Route::get('/duty',function() {
+    return view('fillDuty',['js_name' => 'fillDuty']);
+});
+
 Route::middleware(['ipAuth'])->group(function () {
     Route::get('/checklist', function () {
         return view('checklist', ['js_name' => 'checklist']);

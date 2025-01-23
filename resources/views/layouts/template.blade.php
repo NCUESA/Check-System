@@ -26,7 +26,10 @@
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="./">首頁</a>
                     </li>
-                    @if (session('hasAccess'))
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="./duty">填寫值勤時間</a>
+                    </li>
+                    @if ($hasAccess)
                         <li class="nav-item">
                             <a class="nav-link active" aria-current="page" href="./checklist">打卡清單</a>
                         </li>
@@ -57,6 +60,15 @@
                     </li>
                 -->
                 </ul>
+            </div>
+            <!-- 新增 IP 和權限顯示 -->
+            <div class="d-flex align-items-center">
+                <span class="badge bg-primary me-2">
+                    IP：{{ $clientIp }}
+                </span>
+                <span class="badge {{ $hasAccess ? 'bg-black' : 'bg-success' }}">
+                    {{ $hasAccess ? '管理員' : '一般部員' }}
+                </span>
             </div>
     </nav>
 
