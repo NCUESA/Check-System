@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::table('person', function (Blueprint $table) {
             //
-            $table->dropColumn('id');
             $table->primary('inner_code');
         });
     }
