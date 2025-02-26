@@ -58,7 +58,6 @@
             <tr>
                 <th scope="col">學號</th>
                 <th scope="col">姓名</th>
-                <th scope="col">卡號</th>
                 <th scope="col">狀態</th>
                 <th scope="col">異動</th>
             </tr>
