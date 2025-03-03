@@ -1,10 +1,9 @@
 @extends('layouts.template')
 
 @section('content')
-<h2>卡片管理</h2>
-
+<h2 class="mb-3">卡片管理</h2>
 <form id='add-card'>
-    <h6><strong>請注意，此輸入並不防呆，送出前請先再三確認!!!</strong></h6>
+    <h6 class="mb-3"><strong>請注意，此輸入並不防呆，送出前請先再三確認!!!</strong></h6>
     <div class="row g-3 align-items-center">
         <div class="col-2" hidden>
             <input type="input" id="id" class="form-control" placeholder="id">

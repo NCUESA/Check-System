@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\CardCollection;
+use App\Http\Resources\CardResource;
 use App\Models\Card;
 use Illuminate\Http\Request;
 
@@ -14,7 +16,7 @@ class CardController extends Controller
     {
         //
         $cards = Card::all();
-        return response()->json(['success' => true, 'data' => $cards], 200);
+        return response()->json(['success' => true, 'data' => new CardCollection($cards)], 200);
     }
 
     /**

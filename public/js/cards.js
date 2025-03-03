@@ -74,11 +74,12 @@ function genTable(data) {
         const radio_val = item.status == '0' ? 'DOWN' : item.status == '1' ? 'UP' : 'N/A';
         var row = '<tr>' +
             '<td>' + item.id + '</td>' +
-            '<td>' + item.person_id + '</td>' +
+            '<td>' + item.person.name + '</td>' +
             '<td>' + item.inner_code + '</td>' +
             '<td>' + radio_val + '</td>' +
 
             '<td>' + `<button type="button" id=data-move-${item.id} class="data-move btn btn-outline-secondary">異動</button>` + '</td>' +  // Img Column
+            '<td hidden>' + item.person_id + '</td>' +
             '</tr>';
         // 將生成的行添加到表格的 tbody 中
         $('#cards_table').append(row);
@@ -188,7 +189,7 @@ function fillIn (btnId) {
 
     // 提取每個 td 的內容
     const id = currentRow.find('td').eq(0).text();
-    const personId = currentRow.find('td').eq(1).text();
+    const personId = currentRow.find('td').eq(5).text();
     const innerCode = currentRow.find('td').eq(2).text();
     const statusText = currentRow.find('td').eq(3).text();
     const stat = statusText == 'DOWN' ? '0' : statusText == 'UP' ? '1' : 'X';
