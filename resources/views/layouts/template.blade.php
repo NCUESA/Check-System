@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hans-TW">
 
 <head>
     <meta charset="UTF-8">
@@ -9,7 +9,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link href="{{ asset('css/index.css') }}" rel="stylesheet">
-    <title>值勤打卡系統</title>
+    <link rel="shortcut icon" href="{{ asset('/image/favicon.ico') }}">
+    <link rel="bookmark" href="{{ asset('/image/favicon.ico') }}">
+    <title>值勤打卡系統 - 國立彰化師範大學學生會</title>
 </head>
 
 <body>
