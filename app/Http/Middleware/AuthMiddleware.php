@@ -39,7 +39,7 @@ class AuthMiddleware
 
 
         if (!$isAllowed) {
-            return abort(403, '您沒有權限訪問該頁面');
+            abort(403, '您沒有權限訪問該頁面');
         }
         
         
