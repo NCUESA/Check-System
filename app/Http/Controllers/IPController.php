@@ -55,7 +55,7 @@ class IPController extends Controller
         ]);
         $id = $request->input('id');
 
-        $res = AuthIP::where('id', $id)
+        $res = AuthIP::where('id', '=',$id)
             ->delete();
 
         if($res){
