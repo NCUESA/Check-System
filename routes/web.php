@@ -30,12 +30,13 @@ Route::middleware(['ipAuth'])->group(function () {
     });
 });
 
+// Cards
 Route::group([], function () {
-    Route::post('/cards/all', [CardController::class, 'index']);
-    Route::post('/cards', [CardController::class, 'store']);
-    Route::post('/cards/{id}', [CardController::class, 'update']);
+    Route::get('/show-cards', [CardController::class,'index']);
+    Route::post('/add-card', [CardController::class, 'store']);
+    Route::put('/update-card', [CardController::class, 'update']);
+    Route::delete('/delete-card', [CardController::class, 'destroy']);
 });
-
 
 // Person
 Route::group([],function () {

@@ -7,16 +7,16 @@
     <h6><strong>請注意，此輸入並不防呆，送出前請先再三確認!!!</strong></h6>
     <div class="row g-3 align-items-center">
         <div class="col-2" hidden>
-            <input type="input" id="add_id" class="form-control" placeholder="id">
+            <input type="input" id="id" class="form-control" placeholder="id">
         </div>
         <div class="col-1">
-            <label for="add-ip" class="col-form-label">卡號內碼</label>
+            <label for="inner-code" class="col-form-label">卡號內碼</label>
         </div>
         <div class="col-2">
             <input type="input" id="inner-code" class="form-control" placeholder="輸入卡號內碼" required>
         </div>
         <div class="col-1">
-            <label for="card-owner" class="col-form-label">卡片擁有者學號</label>
+            <label for="person-select" class="col-form-label">卡片擁有者學號</label>
         </div>
         <div class="col-2">
             <select id="person-select" required class="form-select">
@@ -27,13 +27,13 @@
         <div class="col-2">
             <label for="status" class="col-form-label">狀態</label>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="status" value="1"required>
+                <input class="form-check-input" type="radio" name="status" value="1" required>
                 <label class="form-check-label" for="up">
                     UP
                 </label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="status" value="0"required>
+                <input class="form-check-input" type="radio" name="status" value="0" required>
                 <label class="form-check-label" for="down">
                     DOWN
                 </label>
@@ -53,6 +53,7 @@
 <table class="table">
     <thead>
         <tr>
+            <th scope="col">#</th>
             <th scope="col">擁有者</th>
             <th scope="col">卡號內碼</th>
             <th scope="col">狀態</th>

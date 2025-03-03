@@ -76,14 +76,18 @@ class CardController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Card $card)
+    public function update(Request $request)
     {
         //
         $request->validate([
+            'id' =>  'required|exists:cards,id', 
             'person_id' => 'required|exists:person,id', 
             'inner_code' => 'required|max:50', 
             'status' => 'required|boolean',
         ]);
+
+        $id = $request->input('id');
+        $card = Card::where('id', '=', $id);
 
         $person_id = $request->input('person_id');
         $inner_code = $request->input('inner_code');
@@ -106,8 +110,22 @@ class CardController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Card $card)
+    public function destroy(Request $request)
     {
         //
+        $request->validate([
+            'id' =>  'required|exists:cards,id'
+        ]);
+
+        $id = $request->input('id');
+        $res = Card::where('id', '=', $id)->delete();
+
+        if ($res) {
+            return response()->json(['success'=> true, 'data'=> "刪除成功"]);
+        }
+        else {
+            return response()->json(['success'=> false, 'data'=> '刪除失敗']);
+        }
+
     }
 }
