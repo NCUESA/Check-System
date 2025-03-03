@@ -13,37 +13,40 @@
             <label for="add-ip" class="col-form-label">卡號內碼</label>
         </div>
         <div class="col-2">
-            <input type="input" id="add-ip" class="form-control" placeholder="輸入卡號內碼" required>
+            <input type="input" id="inner-code" class="form-control" placeholder="輸入卡號內碼" required>
         </div>
         <div class="col-1">
             <label for="card-owner" class="col-form-label">卡片擁有者學號</label>
         </div>
         <div class="col-2">
-            <input type="input" id="card-owner" class="form-control" maxlength="8" placeholder="輸入卡片擁有者學號" required>
+            <select id="person-select" required class="form-select">
+                <option value="">請選擇卡片擁有者</option>
+                <!--一坨-->
+            </select>
         </div>
         <div class="col-2">
             <label for="status" class="col-form-label">狀態</label>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="status" value="u" id="up" required>
+                <input class="form-check-input" type="radio" name="status" value="1"required>
                 <label class="form-check-label" for="up">
                     UP
                 </label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="status" value="d" id="down" required>
+                <input class="form-check-input" type="radio" name="status" value="0"required>
                 <label class="form-check-label" for="down">
                     DOWN
                 </label>
             </div>
         </div>
         <div class="col-2 d-grid gap-2">
-            <button type="submit" class="btn btn-success btn-block" id="add-ip">送出新增(調整)</button>
+            <button type="submit" class="btn btn-success btn-block" id="submit">送出新增(調整)</button>
         </div>
         <div class="col-1 d-grid gap-2">
-            <button type="button" class="btn btn-warning btn-block" id="delete-ip">刪除此筆</button>
+            <button type="button" class="btn btn-warning btn-block" id="delete">刪除此筆</button>
         </div>
         <div class="col-1 d-grid gap-2">
-            <button type="reset" class="btn btn-danger btn-block">取消重填</button>
+            <button type="reset" class="btn btn-danger btn-block" id="reset">取消重填</button>
         </div>
     </div>
 </form>

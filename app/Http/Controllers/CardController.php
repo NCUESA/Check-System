@@ -32,6 +32,12 @@ class CardController extends Controller
     public function store(Request $request)
     {
         //
+        $request->validate([
+            'person_id' => 'required|exists:person,id', 
+            'inner_code' => 'required|max:50', 
+            'status' => 'required|boolean',
+        ]);
+
         $person_id = $request->input('person_id');
         $inner_code = $request->input('inner_code');
         $status = $request->input('status');
@@ -73,6 +79,12 @@ class CardController extends Controller
     public function update(Request $request, Card $card)
     {
         //
+        $request->validate([
+            'person_id' => 'required|exists:person,id', 
+            'inner_code' => 'required|max:50', 
+            'status' => 'required|boolean',
+        ]);
+
         $person_id = $request->input('person_id');
         $inner_code = $request->input('inner_code');
         $status = $request->input('status');
