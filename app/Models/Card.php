@@ -14,4 +14,8 @@ class Card extends Model
         "inner_code", 
         "status"
     ];
+
+    public function owner() {
+        return $this->belongsTo(User::class, 'person_id', 'id');
+    }
 }
