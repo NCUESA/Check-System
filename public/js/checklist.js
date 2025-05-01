@@ -158,7 +158,7 @@ function genTable(data) {
 function getIPSource(ip_string) {
     let ip_table = {
         '10.21.44.35': '寶山',
-        '10.21.44.148': '進德',
+        '10.21.52.7': '進德',
         '120.107.148.249': '進德Server',
         '120.107.148.253': 'NAS_IP'
     };
