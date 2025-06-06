@@ -5,9 +5,10 @@ use App\Http\Controllers\JobController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\IPController;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 Route::get('/', function () {
-    return view('index', ['js_name' => 'index']);
+    return Inertia::render("Index");
 });
 Route::get('/duty',function() {
     return view('fillDuty',['js_name' => 'fillDuty']);
@@ -19,7 +20,7 @@ Route::middleware(['ipAuth'])->group(function () {
     });
     
     Route::get('/person', function () {
-        return view('person', ['js_name' => 'person']);
+        return Inertia::render("Person");
     });
 
     Route::get('/ip', function () {
@@ -40,8 +41,10 @@ Route::group([], function () {
 
 // Person
 Route::group([],function () {
-    Route::post('/add-user', [PersonController::class, 'addUser']);
-    Route::post('/show-user', [PersonController::class, 'showUserFull']);
+    Route::get('/people', [PersonController::class, 'index'])->name('people.index');
+    Route::post('/people', [PersonController::class, 'store'])->name('people.store');
+    Route::put('/people/{person}', [PersonController::class, 'update'])->name('people.update');
+    Route::delete('/people/{person}', [PersonController::class, 'destroy'])->name('people.delete');
 });
 
 // CheckList

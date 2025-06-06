@@ -10,10 +10,18 @@ class Person extends Model
     use HasFactory;
     protected $table = 'person';
     protected $fillable = [
-        'name',
+        'name', 
+        'stu_id', 
         'inner_code',
         'status'
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'status' => 'boolean'
+        ];
+    }
 
     public function cards() {
         return $this->hasMany(Card::class, 'person_id', 'id');
