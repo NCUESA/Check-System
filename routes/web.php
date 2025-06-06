@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CardController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\IPController;
@@ -24,8 +25,18 @@ Route::middleware(['ipAuth'])->group(function () {
     Route::get('/ip', function () {
         return view('ip', ['js_name' => 'ip']);
     });
+    Route::get('/cards', function () {
+        return view('cards', ['js_name'=> 'cards']);
+    });
 });
 
+// Cards
+Route::group([], function () {
+    Route::get('/show-cards', [CardController::class,'index']);
+    Route::post('/add-card', [CardController::class, 'store']);
+    Route::put('/update-card', [CardController::class, 'update']);
+    Route::delete('/delete-card', [CardController::class, 'destroy']);
+});
 
 // Person
 Route::group([],function () {

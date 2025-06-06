@@ -14,4 +14,8 @@ class Person extends Model
         'inner_code',
         'status'
     ];
+
+    public function cards() {
+        return $this->hasMany(Card::class, 'person_id', 'id');
+    }
 }
