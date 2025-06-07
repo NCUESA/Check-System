@@ -10,11 +10,15 @@ const page = usePage<ChecklistPageProps>()
 const cf = useForm<{
     sid: string, 
     checkin_time: Date, 
-    checkout_time: Date
+    checkout_time: Date, 
+    checkin_at: CheckLoc, 
+    checkout_at: CheckLoc
 }>({
     sid: "", 
     checkin_time: new Date(), 
-    checkout_time: new Date()
+    checkout_time: new Date(), 
+    checkin_at: 'jinde', 
+    checkout_at: 'jinde'
 });
 
 const sf = useForm<{
@@ -62,25 +66,50 @@ const onSfSubmit = () => {
 const onSfReset = () => {
     sf.reset();
 }
+
+const onDelete = ($checklistId: number) => {
+    cf.delete(route('checklist.destroy', { 'checkList': $checklistId }), {
+        onSuccess: () => {
+
+        }, 
+        onError: (err) => {
+
+        }
+    })
+}
 </script>
 
 <template>
     <form id='edit_list' @submit.prevent="onCfSubmit" @reset.prevent="onCfReset">
         <h6><strong>請注意，此輸入並不防呆，送出前請先再三確認!!!</strong></h6>
         <div class="row g-3 align-items-center">
-            <div class="col-12 col-md-3">
-                <label for="inner_code" class="form-label">學號(系統自帶)</label>
-                <input type="text" id="stu_id" class="form-control" placeholder="" required v-model="cf.sid">
-            </div>
-            <div class="col-12 col-md-3">
+            <div class="col-12 col-md-4">
                 <label for="checkin_time" class="form-label">簽到時間</label>
                 <VueDatePicker v-model:model-value="cf.checkin_time" :clearable="false" :minutes-grid-increment="1" :minutes-increment="1" auto-apply/>
             </div>
-            <div class="col-12 col-md-3">
+            <div class="col-12 col-md-4">
                 <label for="checkin_time" class="form-label">簽退時間</label>
                 <VueDatePicker v-model:model-value="cf.checkout_time" :clearable="false" :minutes-grid-increment="1" :minutes-increment="1" auto-apply/>
             </div>
-            <div class="col-12 col-md-3">
+            <div class="col-12 col-md-4">
+                <label for="inner_code" class="form-label">學號(系統自帶)</label>
+                <input type="text" id="stu_id" class="form-control" placeholder="" required v-model="cf.sid">
+            </div>
+            <div class="col-12 col-md-4">
+                <label for="checkin_at" class="form-label">簽到地點</label>
+                <select id="checkin_at" class="form-select"  v-model="cf.checkin_at">
+                    <option value="jinde" selected>進德</option>
+                    <option value="baosan">寶山</option>
+                </select>
+            </div>
+            <div class="col-12 col-md-4">
+                <label for="checkout_at" class="form-label">簽退地點</label>
+                <select id="checkout_at" class="form-select" v-model="cf.checkout_at">
+                    <option value="jinde" selected>進德</option>
+                    <option value="baosan">寶山</option>
+                </select>
+            </div>
+            <div class="col-12 col-md-4">
                 <label class="form-label">動作</label>
                 <div>
                     <div class="btn-group">
@@ -182,6 +211,7 @@ const onSfReset = () => {
                     <th scope="col">簽到地點</th>
                     <th scope="col">簽退時間</th>
                     <th scope="col">簽退地點</th>
+                    <th scope="col">異動</th>
                 </tr>
             </thead>
             <tbody id="all_list">
@@ -192,6 +222,12 @@ const onSfReset = () => {
                     <td>{{ checklist.checkin_ip }}</td>
                     <td>{{ checklist.checkout_time }}</td>
                     <td>{{ checklist.checkout_ip }}</td>
+                    <td>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-info" @click="">編輯</button>
+                            <button type="button" class="btn btn-danger" @click="onDelete(checklist.id)">刪除</button>
+                        </div>
+                    </td>
                 </tr>
             </tbody>
         </table>
