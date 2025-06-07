@@ -14,3 +14,21 @@ export interface Person {
 export interface PeoplePageProps extends SharedData {
     people: Person[]
 }
+
+export type CheckLoc = "jinde" | "bousan" | "other";
+export interface Checklist {
+    id: number
+    name: string, 
+    checkin_time: Date,
+    checkin_operation: string,
+    checkout_time: Date,
+    checkout_operation : boolean,
+    checkin_ip: string,
+    checkout_ip: string,
+    person_id: number, 
+    person?: Person
+}
+
+export interface ChecklistPageProps extends SharedData {
+    checklists: Checklist[]
+}

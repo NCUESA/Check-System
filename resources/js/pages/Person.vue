@@ -76,7 +76,7 @@ const onReset = () => {
     <h2>人員清單管理</h2>
     <hr>
     <form id="add-person" @submit.prevent="onSubmit" @reset.prevent="onReset">
-        <strong>請注意，此輸入並不防呆，送出前請先再三確認!!!</strong>
+        <h6><strong>請注意，此輸入並不防呆，送出前請先再三確認!!!</strong></h6>
         <div class="row g-3 align-items-center">
             <div class="col-12 col-md-4">
                 <label for="add_person" class="form-label">人員新增(變更)</label>

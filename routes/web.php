@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CardController;
+use App\Http\Controllers\ChecklistController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\IPController;
@@ -49,12 +50,20 @@ Route::group([],function () {
 
 // CheckList
 Route::group([],function(){
+    Route::get('/checklist', [ChecklistController::class, 'index'])->name('checklist.index');
+    Route::post('/checklist', [ChecklistController::class, 'store'])->name('checklist.store');
+    Route::put('/checklist/{checkList}', [ChecklistController::class, 'update'])->name('checklist.update');
+    Route::delete('/checklist/{checkList}', [ChecklistController::class, 'destroy'])->name('checklist.destroy');
+});
+/*
+Route::group([],function(){
     Route::post('/check', [JobController::class, 'checkInOrOut']);
     Route::post('/show-list', [JobController::class, 'showList']);
     Route::post('/show-list-condition', [JobController::class, 'showListCondition']);
     Route::post('/update-list', [JobController::class, 'manualUpdateList']);
     Route::post('/gen-month-table',[JobController::class,'genMonthTable']);
 });
+*/
 
 // IP
 Route::group([],function(){
