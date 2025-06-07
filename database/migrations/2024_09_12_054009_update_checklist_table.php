@@ -27,6 +27,10 @@ return new class extends Migration
     {
         Schema::table('checklist', function (Blueprint $table) {
             //
+            $table->dropColumn('checkout_operation');
+            $table->dropColumn('checkin_operation');
+            $table->dropColumn('checkout_time');
+            $table->dropColumn('checkin_time');
         });
     }
 };

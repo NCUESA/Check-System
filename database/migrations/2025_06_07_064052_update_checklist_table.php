@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        //
         Schema::table('checklist', function (Blueprint $table) {
-            //
-            $table->foreign('inner_code')->references('inner_code')->on('person');
+            $table->foreignId("person_id")->references("id")->on("person")->cascadeOnDelete()->cascadeOnUpdate();
         });
     }
 
@@ -22,8 +22,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+        //
         Schema::table('checklist', function (Blueprint $table) {
-            //
+            $table->dropConstrainedForeignId("person_id");
         });
     }
 };

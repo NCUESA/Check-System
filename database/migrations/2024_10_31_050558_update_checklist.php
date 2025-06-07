@@ -25,6 +25,8 @@ return new class extends Migration
     {
         Schema::table('checklist', function (Blueprint $table) {
             //
+            $table->string('checkout_place',10)->default('jinde');
+            $table->string('checkin_place',10)->default('jinde');
         });
     }
 };
