@@ -12,9 +12,11 @@ class Person extends Model
     protected $fillable = [
         'name', 
         'stu_id', 
-        'inner_code',
+        'inner_code', 
+        'inner_code_backup', 
         'status'
     ];
+    protected $primaryKey = "inner_code";
     protected function casts(): array
     {
         return [

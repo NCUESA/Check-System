@@ -2,6 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Card;
+use App\Models\CheckList;
+use App\Models\Person;
 use Illuminate\Console\Command;
 
 class AssignChecklistToPerson extends Command
@@ -26,6 +29,23 @@ class AssignChecklistToPerson extends Command
     public function handle()
     {
         //
-        
+        $checklists = CheckList::all();
+        foreach ($checklists as $checklist) {
+            $person = Person::where("inner_code_backup", "=", $checklist->inner_code_backup)->first();
+            if (!$person) {
+                $checklist->update(['person_id' => null]);
+            }
+            else {
+                $checklist->update(['person_id' => $person->id]);
+                $card = Card::where('person_id', '=', $person->id)->first();
+                if (!$card && $person->inner_code) {
+                    Card::create([
+                        'person_id' => $person->id, 
+                        'inner_code' => $person->inner_code, 
+                        'status' => $person->status
+                    ]);
+                }
+            }
+        }
     }
 }
