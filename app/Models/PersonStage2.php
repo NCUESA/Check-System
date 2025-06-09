@@ -13,8 +13,11 @@ class Person extends Model
         'name', 
         'stu_id', 
         'inner_code',
-        'status'
+        'status', 
+        'inner_code_backup'
     ];
+    protected $primaryKey = "inner_code";
+
     protected function casts(): array
     {
         return [
