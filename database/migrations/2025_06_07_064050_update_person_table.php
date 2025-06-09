@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Person;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,9 +13,8 @@ return new class extends Migration
     public function up(): void
     {
         //
-        Schema::table('checklist', function (Blueprint $table) {
-            $table->dropColumn("inner_code");
-            $table->foreignId("person_id")->references("id")->on("person")->cascadeOnDelete()->cascadeOnUpdate();
+        Schema::table('person', function (Blueprint $table) {
+            $table->string("inner_code_backup");
         });
     }
 
@@ -24,9 +24,8 @@ return new class extends Migration
     public function down(): void
     {
         //
-        Schema::table('checklist', function (Blueprint $table) {
-            $table->dropConstrainedForeignId("person_id");
-            $table->string('inner_code', 20);
+        Schema::table('person', function (Blueprint $table) {
+            $table->dropColumn("inner_code_backup");
         });
     }
 };
