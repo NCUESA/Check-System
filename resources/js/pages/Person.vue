@@ -113,7 +113,6 @@ const onReset = () => {
         <table class="table">
             <thead>
                 <tr>
-                    <th scope="col">#</th>
                     <th scope="col">學號</th>
                     <th scope="col">姓名</th>
                     <th scope="col">狀態</th>
@@ -122,7 +121,6 @@ const onReset = () => {
             </thead>
             <tbody id='people_status'>
                 <tr v-for="person in page.props.people" :key="person.id">
-                    <td>{{ person.id }}</td>
                     <td>{{ person.stu_id }}</td>
                     <td>{{ person.name }}</td>
                     <td>{{ person.status === undefined ? "UNKNOWN" : person.status ? "UP" : "DOWN" }}</td>

@@ -14,6 +14,7 @@
         "@inertiajs/vue3": "^2.0.11",
         "@vitejs/plugin-vue": "^5.2.4",
         "@vuepic/vue-datepicker": "^11.0.2",
+        "@vueuse/core": "^13.3.0",
         "bootstrap": "^5.3.6",
         "ziggy-js": "^2.5.3"
     }

@@ -1,6 +1,11 @@
 <script setup lang="ts">
-import { usePage } from '@inertiajs/vue3';
+import { router, usePage } from '@inertiajs/vue3';
+import { route } from 'ziggy-js';
 const page = usePage();
+
+const onClick = (routeName: string) => {
+    router.visit(route(routeName));
+}
 </script>
 
 <template>
@@ -15,23 +20,23 @@ const page = usePage();
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="./">首頁</a>
+                        <a class="nav-link active" aria-current="page" href="javascript:void(0)" @click="onClick('home')">首頁</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="./duty">填寫值勤時間</a>
+                        <a class="nav-link active" aria-current="page" href="javascript:void(0)" @click="onClick('home')">填寫值勤時間</a>
                     </li>
                     
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="./checklist">打卡清單</a>
+                        <a class="nav-link active" aria-current="page" href="javascript:void(0)" @click="onClick('checklists.index')">打卡清單</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="./person">人員管理</a>
+                        <a class="nav-link active" aria-current="page" href="javascript:void(0)" @click="onClick('people.index')">人員管理</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="./cards">卡片管理</a>
+                        <a class="nav-link active" aria-current="page" href="javascript:void(0)" @click="onClick('cards.index')">卡片管理</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="./ip">IP管理</a>
+                        <a class="nav-link active" aria-current="page" href="javascript:void(0)" @click="onClick('ip.index')">IP管理</a>
                     </li>
                     
                 </ul>

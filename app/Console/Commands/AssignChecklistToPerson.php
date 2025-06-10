@@ -38,10 +38,10 @@ class AssignChecklistToPerson extends Command
             else {
                 $checklist->update(['person_id' => $person->id]);
                 $card = Card::where('person_id', '=', $person->id)->first();
-                if (!$card && $person->inner_code) {
+                if (!$card && $person->inner_code_backup) {
                     Card::create([
                         'person_id' => $person->id, 
-                        'inner_code' => $person->inner_code, 
+                        'inner_code' => $person->inner_code_backup, 
                         'status' => $person->status
                     ]);
                 }
