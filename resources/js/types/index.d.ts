@@ -32,3 +32,16 @@ export interface Checklist {
 export interface ChecklistPageProps extends SharedData {
     checklists: Checklist[]
 }
+
+export interface Card {
+    id: number, 
+    inner_code: string, 
+    person_id: number, 
+    status: boolean, 
+    owner?: Person
+}
+
+export interface CardPageProps extends SharedData {
+    cards: Card[], 
+    people?: Person[]
+}

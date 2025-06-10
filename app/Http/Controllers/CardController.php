@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Resources\CardCollection;
 use App\Http\Resources\CardResource;
 use App\Models\Card;
+use App\Models\Person;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class CardController extends Controller
 {
@@ -15,8 +17,9 @@ class CardController extends Controller
     public function index()
     {
         //
-        $cards = Card::all();
-        return response()->json(['success' => true, 'data' => new CardCollection($cards)], 200);
+        $cards = Card::with('owner')->orderBy('inner_code')->get();
+        $people = Person::where('status', '=', true)->orderBy('stu_id')->get();
+        return Inertia::render("Cards", ['cards' => $cards, 'people' => $people]);
     }
 
     /**
@@ -44,18 +47,13 @@ class CardController extends Controller
         $inner_code = $request->input('inner_code');
         $status = $request->input('status');
 
-        $res = Card::create([
+        $card = Card::create([
             'person_id'=> $person_id,
             'inner_code'=> $inner_code,
             'status'=> $status
         ]);
 
-        if ($res) {
-            return response()->json(['success' => true, 'data' => "新增成功"]);  
-        }
-        else {
-            return response()->json(['success' => false, 'data' => "新增失敗"]);
-        }
+        return redirect()->back()->with(['card' => $card]);
     }
 
     /**

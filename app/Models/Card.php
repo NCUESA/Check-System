@@ -15,7 +15,14 @@ class Card extends Model
         "status"
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'status' => 'boolean'
+        ];
+    }
+
     public function owner() {
-        return $this->belongsTo(User::class, 'person_id', 'id');
+        return $this->belongsTo(Person::class, 'person_id', 'id');
     }
 }

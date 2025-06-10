@@ -34,10 +34,10 @@ Route::middleware(['ipAuth'])->group(function () {
 
 // Cards
 Route::group([], function () {
-    Route::get('/show-cards', [CardController::class,'index']);
-    Route::post('/add-card', [CardController::class, 'store']);
-    Route::put('/update-card', [CardController::class, 'update']);
-    Route::delete('/delete-card', [CardController::class, 'destroy']);
+    Route::get('/cards', [CardController::class,'index'])->name('cards.index');
+    Route::post('/cards', [CardController::class, 'store'])->name('cards.store');
+    Route::put('/cards', [CardController::class, 'update'])->name('cards.update');
+    Route::delete('/cards', [CardController::class, 'destroy'])->name('cards.destroy');
 });
 
 // Person
