@@ -106,7 +106,7 @@ const onReset = () => {
                 <td>{{ card.inner_code }}</td>
                 <td>{{ card.status ? "UP" : "DOWN" }}</td>
                 <td>
-                    <div class="btn-grouzp">
+                    <div class="btn-group">
                         <button type="button" class="btn btn-info">異動</button>
                         <button type="button" class="btn btn-danger">刪除</button>
                     </div>
