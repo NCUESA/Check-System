@@ -68,9 +68,9 @@ Route::group([],function(){
 
 // IP
 Route::group([],function(){
-    Route::post('/show-ip', [IPController::class, 'showIP']);
-    Route::post('/add-ip', [IPController::class, 'addIP']);
-    Route::post('/delete-ip',[IPController::class,'deleteIP']); 
+    Route::get('/ip', [IPController::class, 'index'])->name('ip.index');
+    Route::post('/ip', [IPController::class, 'store'])->name('ip.store');
+    Route::delete('/ip/{authIp}',[IPController::class,'destroy'])->name('ip.destroy'); 
 });
 
 Route::get('/refresh-csrf-token', function () {

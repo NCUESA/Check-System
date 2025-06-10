@@ -45,3 +45,14 @@ export interface CardPageProps extends SharedData {
     cards: Card[], 
     people?: Person[]
 }
+
+export interface AuthIp {
+    id: number, 
+    ip_address: string, 
+    description: string, 
+    status: boolean
+}
+
+export interface IpPageProps extends SharedData {
+    ips: AuthIp[]
+}

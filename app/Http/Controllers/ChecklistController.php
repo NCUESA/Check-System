@@ -118,6 +118,9 @@ class ChecklistController extends Controller
     public function update(Request $request, CheckList $checkList)
     {
         //
+        $data = $request->validated();
+        $checkList->update($data);
+        return redirect()->back()->with(['checklist' => $checkList]);
     }
 
     /**
