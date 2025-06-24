@@ -2,8 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\AuthIp;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use Session;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -35,9 +37,34 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        return [
-            ...parent::share($request),
-            //
-        ];
+        $clientIp= '127.0.0.1';
+        if (isset($_SERVER['HTTP_CF_CONNECTING_IPV6'])) {
+            $clientIp = $_SERVER['HTTP_CF_CONNECTING_IPV6'];
+        } 
+        elseif (isset($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+            $clientIp = $_SERVER['HTTP_CF_CONNECTING_IP'];
+        } 
+        elseif (isset($_SERVER["HTTP_X_REAL_IP"])) {
+            $clientIp = $_SERVER["HTTP_X_REAL_IP"];
+        } 
+        elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $clientIp = $_SERVER('HTTP_X_FORWARDED_FOR');
+            $clientIps = explode(',', $clientIp);
+            $clientIp = $clientIps[0];
+        } 
+        elseif (isset($_SERVER['HTTP_CLIENT_IP'])) {
+            $clientIp = $_SERVER['HTTP_CLIENT_IP'];
+        } 
+        else {
+            if (isset($_SERVER['REMOTE_ADDR']))
+                $clientIp = $_SERVER['REMOTE_ADDR'];
+        }
+
+        $isAllowed = AuthIp::where('ip_address', $clientIp)->exists();
+        return array_merge(parent::share($request), [
+            'ip' => $clientIp, 
+            'is_allowed' => $isAllowed,
+            'message' => Session::get('message')
+        ]);
     }
 }

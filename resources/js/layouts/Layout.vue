@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { router, usePage } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
-const page = usePage();
+import { SharedData } from '../types';
+
+const page = usePage<SharedData>();
 
 const onClick = (routeName: string) => {
     router.visit(route(routeName));
@@ -27,7 +29,7 @@ const onClick = (routeName: string) => {
                     </li>
                     
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="javascript:void(0)" @click="onClick('checklists.index')">打卡清單</a>
+                        <a class="nav-link active" aria-current="page" href="javascript:void(0)" @click="onClick('checklist.index')">打卡清單</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="javascript:void(0)" @click="onClick('people.index')">人員管理</a>
@@ -44,10 +46,10 @@ const onClick = (routeName: string) => {
             <!-- 新增 IP 和權限顯示 -->
             <div class="d-flex align-items-center">
                 <span class="badge bg-primary me-2">
-                    IP：{{ $clientIp }}
+                    IP：{{ page.props.ip }}
                 </span>
-                <span class="badge {{ $hasAccess ? 'bg-black' : 'bg-success' }}">
-                    {{ $hasAccess ? '管理員' : '一般部員' }}
+                <span class="badge" :class="{ 'bg-success': page.props.is_allowed, 'bg-dark': !page.props.is_allowed }">
+                    {{ page.props.is_allowed ? '管理員' : '一般部員' }}
                 </span>
             </div>
         </div>

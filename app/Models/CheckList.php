@@ -25,4 +25,10 @@ class CheckList extends Model
         return $this->belongsTo(Person::class, 'person_id', 'id');
     }
 
+    protected function casts()  {
+        return [
+            
+        ];
+    }
+
 }

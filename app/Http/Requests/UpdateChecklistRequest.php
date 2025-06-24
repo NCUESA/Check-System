@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateChecklistRequest extends FormRequest
 {
@@ -11,7 +12,7 @@ class UpdateChecklistRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,6 +24,11 @@ class UpdateChecklistRequest extends FormRequest
     {
         return [
             //
+            "sid" => "string|required", 
+            "checkin_time" => "date|required", 
+            "checkout_time" => "date|required", 
+            "checkin_at" => ['required', Rule::in(['jinde', 'baosan', 'other'])], 
+            "checkout_at" => ['required', Rule::in(['jinde', 'baosan', 'other'])]
         ];
     }
 }

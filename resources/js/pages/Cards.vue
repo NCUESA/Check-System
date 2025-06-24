@@ -19,19 +19,44 @@ const selectedCard = ref<Card>();
 
 const onSelect = (card: Card) => {
     selectedCard.value = card;
+    cf.defaults({
+        inner_code: card.inner_code, 
+        person_id: card.person_id, 
+        status: card.status
+    });
+    cf.reset();
+}
+
+const onCancel = () => {
+    selectedCard.value = undefined;
+    cf.defaults({
+        inner_code: "", 
+        person_id: undefined, 
+        status: true
+    });
+    cf.reset();
 }
 
 const onSubmit = () => {
     if (selectedCard.value) {
-
+        cf.put(route('cards.update', { card: selectedCard.value.id }), {
+            onSuccess: () => {
+                alert("修改成功");
+                onCancel();
+            }, 
+            onError: () => {
+                alert("修改失敗");
+            }
+        })
     }
     else {
         cf.post(route('cards.store'), {
-            onSuccess: () => {
-                cf.reset();
+            onSuccess: (event) => {
+                alert("新增成功");
+                onCancel();
             },
             onError: (err) => {
-
+                alert("新增失敗");
             }
         })
     }
@@ -39,6 +64,18 @@ const onSubmit = () => {
 
 const onReset = () => {
     cf.reset();
+}
+
+const onDelete = (cardId: number) => {
+    cf.delete(route('cards.destroy', { card: cardId }), {
+        onSuccess: () => {
+            alert("卡片刪除成功");
+            onCancel();
+        }, 
+        onError: (err) => {
+            alert("卡片刪除失敗");
+        }
+    })
 }
 </script>
 
@@ -84,10 +121,10 @@ const onReset = () => {
                 <button type="submit" class="btn btn-success btn-block" id="submit">送出新增(調整)</button>
             </div>
             <div class="col-1 d-grid gap-2">
-                <button type="button" class="btn btn-warning btn-block" id="delete">刪除此筆</button>
+                <button type="reset" class="btn btn-danger btn-block" id="reset">取消重填</button>
             </div>
             <div class="col-1 d-grid gap-2">
-                <button type="reset" class="btn btn-danger btn-block" id="reset">取消重填</button>
+                <button type="button" class="btn btn-warning btn-block" id="cancel" @click="onCancel">取消編輯</button>
             </div>
         </div>
     </form>
@@ -107,8 +144,8 @@ const onReset = () => {
                 <td>{{ card.status ? "UP" : "DOWN" }}</td>
                 <td>
                     <div class="btn-group">
-                        <button type="button" class="btn btn-info">異動</button>
-                        <button type="button" class="btn btn-danger">刪除</button>
+                        <button type="button" class="btn btn-info" @click="onSelect(card)">異動</button>
+                        <button type="button" class="btn btn-danger" @click="onDelete(card.id)">刪除</button>
                     </div>
                 </td>
             </tr>

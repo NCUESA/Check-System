@@ -61,6 +61,9 @@ class IPController extends Controller
     public function update(Request $request, AuthIp $authIp)
     {
         //
+        $data = $request->validated();
+        $authIp->update($data);
+        return redirect()->back()->with(['ip' => $authIp]);
     }
 
     /**

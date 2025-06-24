@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreChecklistRequest;
+use App\Http\Requests\UpdateChecklistRequest;
 use App\Models\CheckList;
 use App\Models\Person;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
 
 class ChecklistController extends Controller
@@ -16,27 +19,28 @@ class ChecklistController extends Controller
     public function index()
     {
         //
-        $query = CheckList::with('person');
+        $query = CheckList::query()->with('person');
+        $message = Session::get('message');
 
         $request = request();
         $name = $request->query('name');
         $sid = $request->query('sid');
         $year = $request->query('year');
         $month = $request->query('month');
-        $checkin_at = $request->query('checkin_at');
-        $checkout_at = $request->query('checkout_at');
+        $checkin_at = $request->query('checkin_loc');
+        $checkout_at = $request->query('checkout_loc');
 
         if ($name) {
-            $query = $query->where('name', '=', $name);
+            $query = $query->whereRelation('person', 'name', '=', $name);
         }
         if ($sid) {
-            $query = $query->where('sid', '=', $name);
+            $query = $query->whereRelation('person', 'stu_id', '=', $sid);
         }
         if ($year) {
-            $query = $query->where('year', '=', $name);
+            $query = $query->whereYear('checkin_time', '=', $year);
         }
         if ($month) {
-            $query = $query->where('month', '=', $name);
+            $query = $query->whereMonth('checkin_time', '=', $month);
         }
         if ($checkin_at === "jinde") {
             $query = $query->where('checkin_ip', '=', "10.21.44.148");
@@ -45,14 +49,15 @@ class ChecklistController extends Controller
             $query = $query->where('checkin_ip', '=', "10.21.44.35");
         }
         if ($checkout_at === "jinde") {
-            $query = $query->where('checkin_ip', '=', "10.21.44.148");
+            $query = $query->where('checkout_ip', '=', "10.21.44.148");
         }
         elseif ($checkout_at === "baosan") {
-            $query = $query->where('checkin_ip', '=', "10.21.44.35");
+            $query = $query->where('checkout_ip', '=', "10.21.44.35");
         }
-
         $checklists = $query->get();
-        return Inertia::render("Checklist", ['checklists' => $checklists]);
+        return Inertia::render("Checklist", [
+            'checklists' => $checklists
+        ]);
     }
 
     /**
@@ -71,13 +76,19 @@ class ChecklistController extends Controller
         //
         $data = $request->validated();
         $sid = $data['sid'];
+        $checkinTime = $data['checkin_time'];
+        $checkoutTime = $data['checkout_time'];
         $checkinAt = $data['checkin_at'];
         $checkoutAt = $data['checkout_at'];
-        $person = Person::where('stu_id', '=', $sid)->first();
+        $person = Person::where('stu_id', '=', $sid)->where('status', '=', 1)->first();
         if (!$person) {
             return redirect()->back()->withErrors(['message' => "Person with stu_id " . $sid . " not found."]);
         }
         $data['person_id'] = $person->id;
+        $data['checkin_time'] = Carbon::parse($checkinTime)->timezone('Asia/Taipei')->format('Y-m-d H:i');
+        $data['checkin_operation'] = 1;
+        $data['checkout_time'] = Carbon::parse($checkoutTime)->timezone('Asia/Taipei')->format('Y-m-d H:i');
+        $data['checkout_operation'] = 1;
 
         if ($checkinAt === "jinde") {
             $data['checkin_ip'] = "10.21.44.148";
@@ -85,11 +96,18 @@ class ChecklistController extends Controller
         elseif ($checkinAt === "baosan") {
             $data['checkin_ip'] = "10.21.44.35";
         }
-        if ($checkoutAt=== "jinde") {
+        else {
+            $data['checkout_ip'] = "0.0.0.0";
+        }
+
+        if ($checkoutAt === "jinde") {
             $data['checkout_ip'] = "10.21.44.148";
         }
         elseif ($checkoutAt === "baosan") {
             $data['checkout_ip'] = "10.21.44.35";
+        }
+        else {
+            $data['checkout_ip'] = "0.0.0.0";
         }
 
         $checkList = CheckList::create($data);
@@ -115,10 +133,45 @@ class ChecklistController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, CheckList $checkList)
+    public function update(UpdateChecklistRequest $request, CheckList $checkList)
     {
         //
         $data = $request->validated();
+        $sid = $data['sid'];
+        $checkinTime = $data['checkin_time'];
+        $checkoutTime = $data['checkout_time'];
+        $checkinAt = $data['checkin_at'];
+        $checkoutAt = $data['checkout_at'];
+        $person = Person::where('stu_id', '=', $sid)->where('status', '=', 1)->first();
+        if (!$person) {
+            return redirect()->back()->withErrors(['message' => "Person with stu_id " . $sid . " not found."]);
+        }
+        $data['person_id'] = $person->id;
+        $data['checkin_time'] = Carbon::parse($checkinTime)->timezone('Asia/Taipei')->format('Y-m-d H:i');
+        $data['checkin_operation'] = 1;
+        $data['checkout_time'] = Carbon::parse($checkoutTime)->timezone('Asia/Taipei')->format('Y-m-d H:i');
+        $data['checkout_operation'] = 1;
+
+        if ($checkinAt === "jinde") {
+            $data['checkin_ip'] = "10.21.44.148";
+        }
+        elseif ($checkinAt === "baosan") {
+            $data['checkin_ip'] = "10.21.44.35";
+        }
+        else {
+            $data['checkout_ip'] = "0.0.0.0";
+        }
+
+        if ($checkoutAt === "jinde") {
+            $data['checkout_ip'] = "10.21.44.148";
+        }
+        elseif ($checkoutAt === "baosan") {
+            $data['checkout_ip'] = "10.21.44.35";
+        }
+        else {
+            $data['checkout_ip'] = "0.0.0.0";
+        }
+
         $checkList->update($data);
         return redirect()->back()->with(['checklist' => $checkList]);
     }

@@ -11,7 +11,7 @@ class CheckRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,7 +23,7 @@ class CheckRequest extends FormRequest
     {
         return [
             //
-            "inner_code"
+            "inner_code" => 'required'
         ];
     }
 }

@@ -1,7 +1,9 @@
 import { PageProps, Page } from '@inertiajs/core'
 
 export interface SharedData extends PageProps {
-
+    ip: string, 
+    is_allowed: boolean, 
+    message?: string
 }
 
 export interface Person {
@@ -15,7 +17,7 @@ export interface PeoplePageProps extends SharedData {
     people: Person[]
 }
 
-export type CheckLoc = "jinde" | "bousan" | "other";
+export type CheckLoc = "jinde" | "baosan" | "other";
 export interface Checklist {
     id: number
     name: string, 

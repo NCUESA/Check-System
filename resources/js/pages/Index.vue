@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3';
+import { useForm, usePage } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { route } from 'ziggy-js';
+import { SharedData } from '../types';
 
-const currentTime = ref<Date>(new Date())
+const page = usePage<SharedData>();
+const currentTime = ref<Date>(new Date());
 
 setInterval(function () {
     currentTime.value = new Date();
@@ -18,7 +20,7 @@ const cf = useForm<{
 const check = () => {
     cf.put(route('check'), {
         onSuccess: () => {
-
+            alert(page.props.message);
         }, 
         onError: (err) => {
 
@@ -41,7 +43,7 @@ const check = () => {
                     d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1z" />
             </svg>打卡欄位</span>
         <input type="text" class="form-control" placeholder="請嗶卡" aria-label="" aria-describedby="basic-addon1"
-            id="check_input" inputmode="numeric" @keydown.enter="check">
+            id="check_input" inputmode="numeric" @keydown.enter="check" v-model="cf.inner_code">
     </div>
 
 

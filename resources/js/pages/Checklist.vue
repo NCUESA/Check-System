@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { useForm, usePage } from '@inertiajs/vue3';
-import type { CheckLoc, ChecklistPageProps } from '../types';
+import type { CheckLoc, Checklist, ChecklistPageProps } from '../types';
 import { route } from 'ziggy-js'
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
+import { utils, writeFileXLSX } from 'xlsx';
+import { ref } from 'vue';
 
-const page = usePage<ChecklistPageProps>()
+const page = usePage<ChecklistPageProps>();
+const clist = ref<Checklist>();
 
 const cf = useForm<{
     sid: string, 
@@ -13,7 +16,7 @@ const cf = useForm<{
     checkout_time: Date, 
     checkin_at: CheckLoc, 
     checkout_at: CheckLoc
-}>({
+}>('CF', {
     sid: "", 
     checkin_time: new Date(), 
     checkout_time: new Date(), 
@@ -24,28 +27,42 @@ const cf = useForm<{
 const sf = useForm<{
     name: string, 
     sid: string, 
-    year: number, 
-    month: number, 
+    year?: number, 
+    month?: number, 
     checkin_loc?: CheckLoc, 
     checkout_loc?: CheckLoc
-}>({
+}>('SearchForm', {
     name: "", 
     sid: "", 
-    year: new Date().getFullYear(), 
-    month: new Date().getMonth() + 1, 
+    year: undefined, 
+    month: undefined, 
     checkin_loc: undefined, 
     checkout_loc: undefined
 });
 
 const onCfSubmit = () => {
-    cf.post(route('checklist.store'), {
-        onSuccess: () => {
-
-        }, 
-        onError: (err) => {
-
-        }
-    })
+    if (clist.value) {
+        cf.put(route('checklist.update', { checkList: clist.value.id }), {
+            onSuccess: () => {
+                alert("修改成功");
+                onCancel();
+            }, 
+            onError: (err) => {
+                alert("修改失敗");
+            }
+        });
+    }
+    else {
+        cf.post(route('checklist.store'), {
+            onSuccess: () => {
+                alert("手動簽到退成功");
+                onCancel();
+            }, 
+            onError: (err) => {
+                alert("手動簽到退失敗");
+            }
+        });
+    }
 }
 
 const onCfReset = () => {
@@ -53,14 +70,15 @@ const onCfReset = () => {
 }
 
 const onSfSubmit = () => {
-    cf.get(route('checklist.index'), {
+    sf.get(route('checklist.index'), {
+        preserveState: true,  
         onSuccess: () => {
-
+            onCancel();
         }, 
         onError: (err) => {
             
         }
-    })
+    });
 }
 
 const onSfReset = () => {
@@ -70,17 +88,50 @@ const onSfReset = () => {
 const onDelete = ($checklistId: number) => {
     cf.delete(route('checklist.destroy', { 'checkList': $checklistId }), {
         onSuccess: () => {
-
+            onCancel();
         }, 
         onError: (err) => {
 
         }
     })
 }
+
+const onEdit = ($checklist: Checklist) => {
+    clist.value = $checklist
+    cf.defaults({
+        sid: $checklist.person?.stu_id, 
+        checkin_at: $checklist.checkin_ip === "10.21.44.148" ? "jinde" : $checklist.checkin_ip === "10.21.44.35" ? "baosan" : $checklist.checkin_ip === "0.0.0.0" ? "other" : undefined, 
+        checkout_at: $checklist.checkout_ip === "10.21.44.148" ? "jinde" : $checklist.checkout_ip === "10.21.44.35" ? "baosan" : $checklist.checkout_ip === "0.0.0.0" ? "other" : undefined, 
+        checkin_time: $checklist.checkin_time, 
+        checkout_time: $checklist.checkout_time
+    });
+    cf.reset();
+}
+
+const onCancel = () => {
+    clist.value = undefined;
+    cf.defaults({
+        sid: "", 
+        checkin_time: new Date(), 
+        checkout_time: new Date(), 
+        checkin_at: 'jinde', 
+        checkout_at: 'jinde'
+    });
+    cf.reset();
+}
+
+const downloadSheet =  () => {
+    const book = utils.book_new();
+    const sheet = utils.json_to_sheet(page.props.checklists, {});
+    utils.book_append_sheet(book, sheet, "報表");
+    const bookName = [ sf.year ?? "All", sf.month ?? "All", sf.name ? sf.name : "All", sf.sid ? sf.sid : "All", sf.checkin_loc ?? "All", sf.checkout_loc ?? "All" ].join("-") + ".xlsx";
+    writeFileXLSX(book, bookName);
+}
 </script>
 
 <template>
     <form id='edit_list' @submit.prevent="onCfSubmit" @reset.prevent="onCfReset">
+        <h6><strong>手動簽到退</strong></h6>
         <h6><strong>請注意，此輸入並不防呆，送出前請先再三確認!!!</strong></h6>
         <div class="row g-3 align-items-center">
             <div class="col-12 col-md-4">
@@ -100,6 +151,7 @@ const onDelete = ($checklistId: number) => {
                 <select id="checkin_at" class="form-select"  v-model="cf.checkin_at">
                     <option value="jinde" selected>進德</option>
                     <option value="baosan">寶山</option>
+                    <option value="other">其他</option>
                 </select>
             </div>
             <div class="col-12 col-md-4">
@@ -107,6 +159,7 @@ const onDelete = ($checklistId: number) => {
                 <select id="checkout_at" class="form-select" v-model="cf.checkout_at">
                     <option value="jinde" selected>進德</option>
                     <option value="baosan">寶山</option>
+                    <option value="other">其他</option>
                 </select>
             </div>
             <div class="col-12 col-md-4">
@@ -119,6 +172,7 @@ const onDelete = ($checklistId: number) => {
                         <button type="reset" class="btn btn-danger btn-block"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
                             <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
                         </svg>取消重填</button>
+                        <button class="btn btn-warning" type="button" @click="onCancel" v-show="clist">取消編輯</button>
                     </div>
                 </div>
             </div>
@@ -153,6 +207,7 @@ const onDelete = ($checklistId: number) => {
             </div>
             <div class="col-2">
                 <select class="form-select" id="search_year" v-model="sf.year">
+                    <option :value="undefined" selected>請選擇年分</option>
                     <option v-for="i in new Date().getFullYear() - 2023" :key="i" :value="new Date().getFullYear() - i + 1">{{ new Date().getFullYear() - i + 1 }}</option>
                 </select>
             </div>
@@ -161,6 +216,7 @@ const onDelete = ($checklistId: number) => {
             </div>
             <div class="col-2">
                 <select class="form-select" id="search_month" v-model="sf.month">
+                    <option :value="undefined" selected>請選擇月分</option>
                     <option v-for="i in 12" :key="i" :value="i">{{ i }}</option>
                 </select>
             </div>
@@ -168,7 +224,7 @@ const onDelete = ($checklistId: number) => {
                 <label for="search_in_place" class="col-form-label">簽到地點</label>
             </div>
             <div class="col-2">
-                <select class="form-select" id="search_in_place">
+                <select class="form-select" id="search_in_place" v-model="sf.checkin_loc">
                     <option selected :value="undefined">請選擇...</option>
                     <option value="jinde">進德</option>
                     <option value="baosan">寶山</option>
@@ -179,25 +235,24 @@ const onDelete = ($checklistId: number) => {
                 <label for="search_out_place" class="col-form-label">簽退地點</label>
             </div>
             <div class="col-2">
-                <select class="form-select" id="search_out_place">
-                    <option selected value="">請選擇...</option>
+                <select class="form-select" id="search_out_place" v-model="sf.checkout_loc">
+                    <option selected :value="undefined">請選擇...</option>
                     <option value="jinde">進德</option>
                     <option value="baosan">寶山</option>
                     <option value="other">其他</option>
                 </select>
             </div>
             <div class="col-3 d-grid gap-2">
-                <button type="button" id="gen_month_paper" class="btn btn-warning btn-block"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar-date" viewBox="0 0 16 16">
+                <button @click="downloadSheet" type="button" id="gen_month_paper" class="btn btn-warning btn-block"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar-date" viewBox="0 0 16 16">
                     <path d="M6.445 11.688V6.354h-.633A13 13 0 0 0 4.5 7.16v.695c.375-.257.969-.62 1.258-.777h.012v4.61zm1.188-1.305c.047.64.594 1.406 1.703 1.406 1.258 0 2-1.066 2-2.871 0-1.934-.781-2.668-1.953-2.668-.926 0-1.797.672-1.797 1.809 0 1.16.824 1.77 1.676 1.77.746 0 1.23-.376 1.383-.79h.027c-.004 1.316-.461 2.164-1.305 2.164-.664 0-1.008-.45-1.05-.82zm2.953-2.317c0 .696-.559 1.18-1.184 1.18-.601 0-1.144-.383-1.144-1.2 0-.823.582-1.21 1.168-1.21.633 0 1.16.398 1.16 1.23"/>
                     <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/>
                 </svg>產生月報表</button>
             </div>
             <div class="col-3 d-grid gap-2">
-                <button type="button" id="search" class="btn btn-primary btn-block"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                <button type="submit" id="search" class="btn btn-primary btn-block"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
                     <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
                 </svg>查詢</button>
             </div>
-
         </div>
     </form>
     <hr>
@@ -224,7 +279,7 @@ const onDelete = ($checklistId: number) => {
                     <td>{{ checklist.checkout_ip }}</td>
                     <td>
                         <div class="btn-group">
-                            <button type="button" class="btn btn-info" @click="">編輯</button>
+                            <button type="button" class="btn btn-info" @click="onEdit(checklist)">編輯</button>
                             <button type="button" class="btn btn-danger" @click="onDelete(checklist.id)">刪除</button>
                         </div>
                     </td>

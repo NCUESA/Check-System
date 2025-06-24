@@ -19,7 +19,14 @@ const page = usePage<IpPageProps>();
 
 const onSubmit = () => {
     if (selectedIp.value) {
+        cf.put(route('ip.update', { ip: selectedIp.value.id }), {
+            onSuccess: () => {
 
+            }, 
+            onError: () => {
+
+            }
+        })
     }
     else {
         cf.post(route('ip.index'), {
@@ -34,6 +41,26 @@ const onSubmit = () => {
 }
 
 const onReset = () => {
+    cf.reset();
+}
+
+const onEdit = (authIp: AuthIp) => {
+    selectedIp.value = authIp;
+    cf.defaults({
+        ip_address: authIp.ip_address, 
+        description: authIp.description, 
+        status: authIp.status
+    });
+    cf.reset();
+}
+
+const onCancel = () => {
+    selectedIp.value = undefined;
+    cf.defaults({
+        ip_address: "", 
+        description: "", 
+        status: true
+    });
     cf.reset();
 }
 
@@ -88,10 +115,10 @@ const onDelete = (authIpId: number) => {
                 <button type="submit" class="btn btn-success btn-block" id="add-ip">送出新增(調整)</button>
             </div>
             <div class="col-1 d-grid gap-2">
-                <button type="button" class="btn btn-warning btn-block" id="delete-ip">刪除此筆</button>
+                <button type="reset" class="btn btn-danger btn-block">取消重填</button>
             </div>
             <div class="col-1 d-grid gap-2">
-                <button type="reset" class="btn btn-danger btn-block">取消重填</button>
+                <button type="button" class="btn btn-warning btn-block" @click="onCancel">取消編輯</button>
             </div>
         </div>
     </form>
@@ -112,7 +139,7 @@ const onDelete = (authIpId: number) => {
                 <td>{{ ip.description }}</td>
                 <td>
                     <div class="btn-group">
-                        <button type="button" class="btn btn-info">異動</button>
+                        <button type="button" class="btn btn-info" @click="onEdit(ip)">異動</button>
                         <button type="button" class="btn btn-danger" @click="onDelete(ip.id)">刪除</button>
                     </div>
                 </td>

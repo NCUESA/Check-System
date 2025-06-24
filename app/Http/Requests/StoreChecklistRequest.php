@@ -27,8 +27,8 @@ class StoreChecklistRequest extends FormRequest
             "sid" => "string|required", 
             "checkin_time" => "date|required", 
             "checkout_time" => "date|required", 
-            "checkin_at" => Rule::in(['jinde', 'baosan']), 
-            "checkout_at" => Rule::in(['jinde', 'baosan'])
+            "checkin_at" => Rule::in(['jinde', 'baosan', 'other']), 
+            "checkout_at" => Rule::in(['jinde', 'baosan', 'other'])
         ];
     }
 }
