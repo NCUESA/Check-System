@@ -3,6 +3,7 @@ import { useForm, usePage } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { route } from 'ziggy-js';
 import { SharedData } from '../types';
+import { toastErrors, toastSuccessMessage, toastPrimaryMessage } from '../utils';
 
 const page = usePage<SharedData>();
 const currentTime = ref<Date>(new Date());
@@ -20,10 +21,10 @@ const cf = useForm<{
 const check = () => {
     cf.put(route('check'), {
         onSuccess: () => {
-            alert(page.props.message);
+            toastPrimaryMessage(page.props.message);
         }, 
         onError: (err) => {
-
+            toastErrors(err);
         }
     })
 }

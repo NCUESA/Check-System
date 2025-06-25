@@ -4,6 +4,7 @@ import { ZiggyVue } from 'ziggy-js';
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.bundle.js'
 import Layout from './layouts/Layout.vue'
+import VueToast from 'vue-toast-notification'
 
 createInertiaApp({
   resolve: name => {
@@ -16,6 +17,7 @@ createInertiaApp({
     createApp({ render: () => h(App, props) })
       .use(plugin)
       .use(ZiggyVue)
+      .use(VueToast)
       .mount(el)
   },
 })
