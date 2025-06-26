@@ -158,6 +158,7 @@ class JobController extends Controller
 
         $ip_to_place = array(
             '10.21.44.148' => 'jinde',
+            '10.21.51.7' => 'jinde',
             '10.21.44.35' => 'baosan',
             '120.107.148.249' => 'manual'
         );
