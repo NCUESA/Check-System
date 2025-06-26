@@ -76,7 +76,8 @@ class CheckController extends Controller
             $checkinTime = Carbon::createFromFormat("Y-m-d H:i", $checklist->checkin_time, 'Asia/Taipei');
             $checkinTimeAfter2Min = $checkinTime->addMinutes(2);
             $interval = $checkinTimeAfter2Min->diff($now, false);
-            if ($checkinTime->diffInMinutes($now, false) < 2) {
+            $diff = $now->diffInMinutes($checkinTime);
+            if ($diff < 2 && $diff >= 0) {
                 return redirect()->back()
                 ->with('checklist', $checklist)
                 ->with('time', $nowStr)
@@ -86,7 +87,7 @@ class CheckController extends Controller
             $checklist->update([
                 'checkout_time' => $nowStr, 
                 'checkout_operation' => 0, 
-                'checkout_at' => $clientIp
+                'checkout_ip' => $clientIp
             ]);
             return redirect()->back()
             ->with('checklist', $checklist)
@@ -98,7 +99,7 @@ class CheckController extends Controller
                 'person_id' => $card->owner->id, 
                 'checkin_time' => $nowStr, 
                 'checkin_operation' => 0, 
-                'checkin_at' => $clientIp
+                'checkin_ip' => $clientIp
             ]);
             $checklist->load('person');
             return redirect()->back()

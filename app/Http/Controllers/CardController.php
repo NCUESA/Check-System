@@ -110,15 +110,10 @@ class CardController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request)
+    public function destroy(Request $request, Card $card)
     {
         //
-        $request->validate([
-            'id' =>  'required|exists:cards,id'
-        ]);
-
-        $id = $request->input('id');
-        $res = Card::where('id', '=', $id)->delete();
+        $res = $card->delete();
 
         if ($res) {
             return redirect()->back();
