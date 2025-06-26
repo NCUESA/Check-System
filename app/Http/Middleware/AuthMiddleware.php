@@ -16,6 +16,7 @@ class AuthMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
+      /*
           $clientIp= '127.0.0.1';
           if (isset($_SERVER['HTTP_CF_CONNECTING_IPV6'])) {
             $clientIp = $_SERVER['HTTP_CF_CONNECTING_IPV6'];
@@ -42,7 +43,7 @@ class AuthMiddleware
             abort(403, '您沒有權限訪問該頁面');
         }
         
-        
+     */   
         return $next($request);
     }
 }

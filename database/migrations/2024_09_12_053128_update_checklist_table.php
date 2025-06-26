@@ -25,6 +25,7 @@ return new class extends Migration
     {
         Schema::table('checklist', function (Blueprint $table) {
             //
+            $table->string('name', 20);
         });
     }
 };

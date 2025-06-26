@@ -12,7 +12,13 @@ class AuthIp extends Model
     protected $fillable = [
         'id',
         'ip_address',
-        'descirption'
+        'description'
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'status' => 'boolean'
+        ];
+    }
 }

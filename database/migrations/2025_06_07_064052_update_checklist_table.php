@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Person;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,9 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('person', function (Blueprint $table) {
-            //
-            $table->primary('inner_code');
+        //
+        Schema::table('checklist', function (Blueprint $table) {
+
+            $table->dropConstrainedForeignId("inner_code");
         });
     }
 
@@ -22,8 +24,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('person', function (Blueprint $table) {
-            //
+        //
+        Schema::table('checklist', function (Blueprint $table) {
+            $table->string("inner_code");
+            $table->foreign("inner_code")->references("id")->on("person");
         });
     }
 };

@@ -2,68 +2,78 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreAuthIpRequest;
+use App\Http\Requests\UpdateAuthIpRequest;
 use App\Models\AuthIp;
+use Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Inertia\Inertia;
 
 class IPController extends Controller
 {
-    //
-    public function showIP(Request $request)
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
     {
-        $ip_info = AuthIp::all();
-
-        return response()->json(['success' => true, 'data' => $ip_info], 200);
+        //
+        $ips = AuthIp::orderBy('ip_address')->get();
+        return Inertia::render("Ip", ['ips' => $ips]);
     }
 
-    public function addIP(Request $request)
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
     {
-        $validator = Validator::make($request->all(), [
-            'ip' => 'required',
-            'description' => 'max:50'
-        ]);
-        $id = $request->input('id');
-        $ip = $request->input('ip');
-        $status = $request->input('status');
-        $description = $request->input('description');
-
-        if ($status == 'd') {
-            $status = 0;
-        } elseif ($status == 'u') {
-            $status = 1;
-        }
-
-        $ip_exist = AuthIp::where(['id' => $id])
-            ->exists();
-
-        if ($ip_exist) {
-            AuthIp::where(['id' => $id])
-                ->update(['ip_address' => $ip, 'status' => $status, 'description' => $description]);
-        } else {
-            AuthIP::create(['id' => $id, 'ip_address' => $ip, 'status' => $status, 'description' => $description]);
-        }
-
-        //AuthIp::where('ip_address', $ip)->update(['status' => $status]);
-        return response()->json(['success' => true, 'message' => '資料已更新'], 200);
+        //
     }
-    public function deleteIP(Request $request)
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(StoreAuthIpRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'id' => 'required',
-            'ip' => 'required',
-            'description' => 'max:50'
-        ]);
-        $id = $request->input('id');
+        //
+        $data = $request->validated();
+        $ip = AuthIp::create($data);
+        return redirect()->back()->with(['ip' => $ip]);
+    }
 
-        $res = AuthIP::where('id', '=',$id)
-            ->delete();
+    /**
+     * Display the specified resource.
+     */
+    public function show(AuthIp $authIp)
+    {
+        //
+    }
 
-        if($res){
-            return response()->json(['success' => true, 'message' => '資料已更新'], 200);
-        }
-        else{
-            return response()->json(['success' => true, 'message' => '無資料'], 500);
-        }
-       
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(AuthIp $authIp)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(UpdateAuthIpRequest $request, AuthIp $authIp)
+    {
+        //
+        $data = $request->validated();
+        $authIp->update($data);
+        return redirect()->back()->with('ip', $authIp);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(AuthIp $authIp)
+    {
+        //
+        $authIp->delete();
+        return redirect()->back();
     }
 }

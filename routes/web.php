@@ -1,25 +1,34 @@
 <?php
 
 use App\Http\Controllers\CardController;
+use App\Http\Controllers\CheckController;
+use App\Http\Controllers\ChecklistController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\IPController;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 Route::get('/', function () {
-    return view('index', ['js_name' => 'index']);
-});
+    return Inertia::render("Index", [
+        'checklist' => Session::get('checklist'), 
+        'time' => Session::get('time'), 
+        'status' => Session::get('status')
+    ]);
+})->name('home');
+
 Route::get('/duty',function() {
     return view('fillDuty',['js_name' => 'fillDuty']);
 });
 
+/*
 Route::middleware(['ipAuth'])->group(function () {
     Route::get('/checklist', function () {
-        return view('checklist', ['js_name' => 'checklist']);
+        return Inertia::render("Checklist");
     });
     
     Route::get('/person', function () {
-        return view('person', ['js_name' => 'person']);
+        return Inertia::render("Person");
     });
 
     Route::get('/ip', function () {
@@ -28,36 +37,42 @@ Route::middleware(['ipAuth'])->group(function () {
     Route::get('/cards', function () {
         return view('cards', ['js_name'=> 'cards']);
     });
+    Route::put('/check', CheckController::class)->name('check');
 });
+*/
+
+Route::put('/check', CheckController::class)->name('check');
 
 // Cards
 Route::group([], function () {
-    Route::get('/show-cards', [CardController::class,'index']);
-    Route::post('/add-card', [CardController::class, 'store']);
-    Route::put('/update-card', [CardController::class, 'update']);
-    Route::delete('/delete-card', [CardController::class, 'destroy']);
+    Route::get('/cards', [CardController::class,'index'])->name('cards.index');
+    Route::post('/cards', [CardController::class, 'store'])->name('cards.store');
+    Route::put('/cards/{card}', [CardController::class, 'update'])->name('cards.update');
+    Route::delete('/cards/{card}', [CardController::class, 'destroy'])->name('cards.destroy');
 });
 
 // Person
 Route::group([],function () {
-    Route::post('/add-user', [PersonController::class, 'addUser']);
-    Route::post('/show-user', [PersonController::class, 'showUserFull']);
+    Route::get('/people', [PersonController::class, 'index'])->name('people.index');
+    Route::post('/people', [PersonController::class, 'store'])->name('people.store');
+    Route::put('/people/{person}', [PersonController::class, 'update'])->name('people.update');
+    Route::delete('/people/{person}', [PersonController::class, 'destroy'])->name('people.delete');
 });
 
 // CheckList
 Route::group([],function(){
-    Route::post('/check', [JobController::class, 'checkInOrOut']);
-    Route::post('/show-list', [JobController::class, 'showList']);
-    Route::post('/show-list-condition', [JobController::class, 'showListCondition']);
-    Route::post('/update-list', [JobController::class, 'manualUpdateList']);
-    Route::post('/gen-month-table',[JobController::class,'genMonthTable']);
+    Route::get('/checklist', [ChecklistController::class, 'index'])->name('checklist.index');
+    Route::post('/checklist', [ChecklistController::class, 'store'])->name('checklist.store');
+    Route::put('/checklist/{checkList}', [ChecklistController::class, 'update'])->name('checklist.update');
+    Route::delete('/checklist/{checkList}', [ChecklistController::class, 'destroy'])->name('checklist.destroy');
 });
 
 // IP
 Route::group([],function(){
-    Route::post('/show-ip', [IPController::class, 'showIP']);
-    Route::post('/add-ip', [IPController::class, 'addIP']);
-    Route::post('/delete-ip',[IPController::class,'deleteIP']); 
+    Route::get('/ip', [IPController::class, 'index'])->name('ip.index');
+    Route::post('/ip', [IPController::class, 'store'])->name('ip.store');
+    Route::put('/ip/{authIp}', [IPController::class, 'update'])->name('ip.update');
+    Route::delete('/ip/{authIp}',[IPController::class,'destroy'])->name('ip.destroy');
 });
 
 Route::get('/refresh-csrf-token', function () {

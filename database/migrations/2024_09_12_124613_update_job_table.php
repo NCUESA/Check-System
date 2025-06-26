@@ -25,6 +25,8 @@ return new class extends Migration
     {
         Schema::table('checklist', function (Blueprint $table) {
             //
+            $table->dropColumn("checkout_ip");
+            $table->dropColumn("checkin_ip");
         });
     }
 };

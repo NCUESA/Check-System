@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Resources\CardCollection;
 use App\Http\Resources\CardResource;
 use App\Models\Card;
+use App\Models\Person;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class CardController extends Controller
 {
@@ -15,8 +17,11 @@ class CardController extends Controller
     public function index()
     {
         //
-        $cards = Card::all();
-        return response()->json(['success' => true, 'data' => new CardCollection($cards)], 200);
+        $cards = Card::with('owner')->orderBy('inner_code')->get();
+        $people = Person::orderBy('stu_id')->orderBy('stu_id')->get();
+        return Inertia::render("Cards", [
+            'cards' => $cards, 'people' => $people
+        ]);
     }
 
     /**
@@ -44,18 +49,13 @@ class CardController extends Controller
         $inner_code = $request->input('inner_code');
         $status = $request->input('status');
 
-        $res = Card::create([
+        $card = Card::create([
             'person_id'=> $person_id,
             'inner_code'=> $inner_code,
             'status'=> $status
         ]);
 
-        if ($res) {
-            return response()->json(['success' => true, 'data' => "新增成功"]);  
-        }
-        else {
-            return response()->json(['success' => false, 'data' => "新增失敗"]);
-        }
+        return redirect()->back()->with('card', $card);
     }
 
     /**
@@ -78,18 +78,14 @@ class CardController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request)
+    public function update(Request $request, Card $card)
     {
         //
         $request->validate([
-            'id' =>  'required|exists:cards,id', 
             'person_id' => 'required|exists:person,id', 
             'inner_code' => 'required|max:50', 
             'status' => 'required|boolean',
         ]);
-
-        $id = $request->input('id');
-        $card = Card::where('id', '=', $id);
 
         $person_id = $request->input('person_id');
         $inner_code = $request->input('inner_code');
@@ -102,31 +98,30 @@ class CardController extends Controller
         ]);
 
         if ($res) {
-            return response()->json(['success'=> true, 'data'=> "修改成功"]);
+            return redirect()->back()->with('card', $card);
         }
         else {
-            return response()->json(['success'=> false, 'data'=> '修改失敗']);
+            return redirect()->back()->withErrors([
+                'message' => '修改失敗'
+            ]);
         }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request)
+    public function destroy(Request $request, Card $card)
     {
         //
-        $request->validate([
-            'id' =>  'required|exists:cards,id'
-        ]);
-
-        $id = $request->input('id');
-        $res = Card::where('id', '=', $id)->delete();
+        $res = $card->delete();
 
         if ($res) {
-            return response()->json(['success'=> true, 'data'=> "刪除成功"]);
+            return redirect()->back();
         }
         else {
-            return response()->json(['success'=> false, 'data'=> '刪除失敗']);
+            return redirect()->back()->withErrors([
+                'message' => '刪除失敗'
+            ]);
         }
 
     }
