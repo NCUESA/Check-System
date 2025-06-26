@@ -29,7 +29,7 @@ class UpdateAuthIpRequest extends FormRequest
                 'max:50', 
                 'string', 
                 'ip', 
-                'unique:authip,ip_address'
+                Rule::unique('authip', 'ip_address')->ignore($this->route('authIp'))
             ], 
             'description' => 'required|max:50|string'
         ];
