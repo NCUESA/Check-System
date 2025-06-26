@@ -28,7 +28,7 @@ class UpdatePersonRequest extends FormRequest
             "stu_id" => [
                 "required", 
                 "string", 
-                Rule::unique('person', 'stu_id')->ignore($this->input('stu_id'), 'stu_id')
+                "unique:person,stu_id"
             ], 
             "status" => "required|boolean"
         ];
@@ -41,7 +41,7 @@ class UpdatePersonRequest extends FormRequest
             'name.string' => "姓名需為一個字串", 
             'stu_id.required' => "請輸入學號", 
             'stu_id.string' => "學號需為一個字串", 
-            'stu_id.unique:person,id' => "已存在學號相同的人員", 
+            'stu_id.unique' => "已存在相同的人員", 
             'status.required' => "請選擇人員狀態", 
             'status.boolean' => "人員狀態需為一布林值"
         ];

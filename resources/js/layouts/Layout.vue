@@ -29,18 +29,17 @@ const onClick = (routeName: string) => {
                     </li>
                     
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="javascript:void(0)" @click="onClick('checklist.index')">打卡清單</a>
+                        <a class="nav-link active" aria-current="page" href="javascript:void(0)" @click="onClick('checklist.index')" v-if="page.props.is_allowed">打卡清單</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="javascript:void(0)" @click="onClick('people.index')">人員管理</a>
+                        <a class="nav-link active" aria-current="page" href="javascript:void(0)" @click="onClick('people.index')" v-if="page.props.is_allowed">人員管理</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="javascript:void(0)" @click="onClick('cards.index')">卡片管理</a>
+                        <a class="nav-link active" aria-current="page" href="javascript:void(0)" @click="onClick('cards.index')" v-if="page.props.is_allowed">卡片管理</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="javascript:void(0)" @click="onClick('ip.index')">IP管理</a>
+                        <a class="nav-link active" aria-current="page" href="javascript:void(0)" @click="onClick('ip.index')" v-if="page.props.is_allowed">IP管理</a>
                     </li>
-                    
                 </ul>
             </div>
             <!-- 新增 IP 和權限顯示 -->

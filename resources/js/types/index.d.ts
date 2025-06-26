@@ -1,4 +1,4 @@
-import { PageProps, Page } from '@inertiajs/core'
+import { PageProps } from '@inertiajs/core'
 
 export interface SharedData extends PageProps {
     ip: string, 

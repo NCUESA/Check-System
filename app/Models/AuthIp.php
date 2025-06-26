@@ -10,7 +10,6 @@ class AuthIp extends Model
     use HasFactory;
     protected $table = 'authip';
     protected $fillable = [
-        'id',
         'ip_address',
         'description'
     ];

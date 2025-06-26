@@ -24,8 +24,22 @@ class StorePersonRequest extends FormRequest
         return [
             //
             "name" => "required|string", 
-            "stu_id" => "required|string", 
+            "stu_id" => "required|string|unique:person,stu_id", 
             "status" => "required|boolean"
         ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'name.required' => "請輸入姓名", 
+            'name.string' => "姓名需為一個字串", 
+            'stu_id.required' => "請輸入學號", 
+            'stu_id.string' => "學號需為一個字串", 
+            'stu_id.unique' => "已存在相同的人員", 
+            'status.required' => "請選擇人員狀態", 
+            'status.boolean' => "人員狀態需為一布林值"
+        ];
+
     }
 }

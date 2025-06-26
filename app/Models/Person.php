@@ -16,7 +16,6 @@ class Person extends Model
         'inner_code_backup', 
         'status'
     ];
-    protected $primaryKey = "inner_code";
     protected function casts(): array
     {
         return [

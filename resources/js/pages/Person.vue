@@ -3,6 +3,7 @@ import { useForm, usePage } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import type { Person, PeoplePageProps } from '../types';
 import { route } from 'ziggy-js'
+import { toastErrors, toastSuccessMessage } from '../utils';
 
 const page = usePage<PeoplePageProps>();
 const currentPerson = ref<Person>();
@@ -14,7 +15,7 @@ const f = useForm<{
 }>({
     name: "", 
     stu_id: "", 
-    status: undefined
+    status: true
 });
 
 const setPerson = (person: Person) => {
@@ -24,12 +25,14 @@ const setPerson = (person: Person) => {
 }
 
 const deletePerson = (personId: number) => {
+    const yes = confirm("你確定要刪除這個人員嗎");
+    if (!yes) return;
     f.delete(route('people.delete', { person: personId }), {
         onSuccess: () => {
-            alert("Success");
+            toastSuccessMessage("刪除成功");
         }, 
-        onError: () => {
-            alert("Failed :(");
+        onError: (err) => {
+            toastErrors(err);
         }
     });
 }
@@ -39,7 +42,7 @@ const cancel = () => {
     f.defaults({
         name: "", 
         stu_id: "", 
-        status: undefined
+        status: true
     });
     f.reset();
 }
@@ -48,20 +51,22 @@ const onSubmit = () => {
     if (currentPerson.value) {
         f.put(route('people.update', { person: currentPerson.value.id }), {
             onSuccess: () => {
-                
+                toastSuccessMessage("修改成功");
+                cancel();
             }, 
             onError: (err) => {
-                Object.entries(err)
+                toastErrors(err);
             }
         })
     }
     else {
         f.post(route('people.store'), {
             onSuccess: () => {
-                
+                toastSuccessMessage("新增成功");
+                cancel();
             }, 
             onError: (err) => {
-                Object.entries(err)
+                toastErrors(err);
             }
         })
     }

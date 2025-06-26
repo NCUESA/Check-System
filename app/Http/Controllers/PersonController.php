@@ -28,7 +28,6 @@ class PersonController extends Controller
     {
         //
         $data = $request->validated();
-        $data = array_merge($data, ["inner_code" => ""]);
         $person = Person::create($data);
         return redirect()->back()->with(['person' => $person]);
     }
