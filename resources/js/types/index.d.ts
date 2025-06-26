@@ -6,6 +6,12 @@ export interface SharedData extends PageProps {
     message?: string
 }
 
+export interface IndexPageProps extends SharedData {
+    checklist?: Checklist, 
+    time?: string, 
+    status?: boolean
+}
+
 export interface Person {
     id: number 
     name: string, 

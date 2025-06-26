@@ -31,4 +31,21 @@ class UpdateChecklistRequest extends FormRequest
             "checkout_at" => ['required', Rule::in(['jinde', 'baosan', 'other'])]
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'sid.required' => "請輸入學號", 
+            'sid.string' => "學號需為一個字串", 
+            'checkin_time.required' => "請輸入簽到時間", 
+            'checkin_time.date' => "簽到時間需為一個日期", 
+            'checkout_time.required' => "請輸入簽退時間", 
+            'checkout_time.date' => "簽退時間需為一個日期", 
+            'checkin_at.required' => '請輸入簽到地點', 
+            'checkin_at.in' => '簽到地點需為進德、寶山或其他', 
+            'checkout_at.required' => '請輸入簽退地點', 
+            'checkout_at.in' => '簽退地點需為進德、寶山或其他'
+        ];
+
+    }
 }

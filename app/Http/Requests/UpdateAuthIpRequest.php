@@ -3,8 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class StoreAuthIpRequest extends FormRequest
+class UpdateAuthIpRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,7 +24,13 @@ class StoreAuthIpRequest extends FormRequest
     {
         return [
             //
-            'ip_address' => 'required|ip|unique:authip,ip_address', 
+            'ip_address' => [
+                'required', 
+                'max:50', 
+                'string', 
+                'ip', 
+                Rule::unique('authip', 'ip_address')->ignore($this->input('ip_address'), 'ip_address')
+            ], 
             'description' => 'required|max:50|string'
         ];
     }

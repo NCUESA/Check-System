@@ -23,7 +23,16 @@ class CheckRequest extends FormRequest
     {
         return [
             //
-            "inner_code" => 'required'
+            "inner_code" => 'required|exists:cards,inner_code'
         ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'inner_code.required' => "請輸入卡號", 
+            'inner_code.exists' => "查無此卡"
+        ];
+
     }
 }

@@ -3,6 +3,7 @@ import { useForm, usePage } from '@inertiajs/vue3';
 import { IpPageProps, AuthIp } from '../types';
 import { ref } from 'vue';
 import { route } from 'ziggy-js';
+import { toastErrors, toastInfoMessage, toastErrorMessage } from '../utils';
 
 const cf = useForm<{
     ip_address: string, 
@@ -19,22 +20,24 @@ const page = usePage<IpPageProps>();
 
 const onSubmit = () => {
     if (selectedIp.value) {
-        cf.put(route('ip.update', { ip: selectedIp.value.id }), {
+        cf.put(route('ip.update', { authIp: selectedIp.value.id }), {
             onSuccess: () => {
-
+                toastInfoMessage("更新成功");
+                onCancel();
             }, 
-            onError: () => {
-
+            onError: (errors) => {
+                toastErrors(errors);
             }
         })
     }
     else {
         cf.post(route('ip.index'), {
             onSuccess: () => {
-                alert("新增成功")
+                toastInfoMessage("新增成功");
+                onCancel();
             }, 
-            onError: (err) => {
-
+            onError: (errors) => {
+                toastErrors(errors);
             }
         })
     }
@@ -65,12 +68,14 @@ const onCancel = () => {
 }
 
 const onDelete = (authIpId: number) => {
+    const yes = confirm("你確定要刪除這個IP嗎");
+    if (!yes) return;
     cf.delete(route('ip.destroy', { authIp: authIpId }), {
         onSuccess: () => {
-            alert("刪除成功");
+            toastInfoMessage("刪除成功");
         }, 
         onError: (err) => {
-
+            toastErrorMessage("刪除失敗");
         }
     })
 }

@@ -10,7 +10,11 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render("Index");
+    return Inertia::render("Index", [
+        'checklist' => Session::get('checklist'), 
+        'time' => Session::get('time'), 
+        'status' => Session::get('status')
+    ]);
 })->name('home');
 
 Route::get('/duty',function() {

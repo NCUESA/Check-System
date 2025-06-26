@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreAuthIpRequest;
+use App\Http\Requests\UpdateAuthIpRequest;
 use App\Models\AuthIp;
 use Auth;
 use Illuminate\Http\Request;
@@ -58,12 +59,12 @@ class IPController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, AuthIp $authIp)
+    public function update(UpdateAuthIpRequest $request, AuthIp $authIp)
     {
         //
         $data = $request->validated();
         $authIp->update($data);
-        return redirect()->back()->with(['ip' => $authIp]);
+        return redirect()->back()->with('ip', $authIp);
     }
 
     /**

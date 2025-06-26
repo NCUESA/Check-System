@@ -30,6 +30,10 @@ export const toastPrimaryMessage = (message: any) => {
     toast.default(message);
 }
 
+export const toastErrorMessage = (message: any) => {
+    toast.error(message);
+}
+
 export const toastErrors = (errors: any) => {
     const errs = Object.entries(errors);
     errs.forEach((v) => {

@@ -18,8 +18,10 @@ class CardController extends Controller
     {
         //
         $cards = Card::with('owner')->orderBy('inner_code')->get();
-        $people = Person::where('status', '=', true)->orderBy('stu_id')->get();
-        return Inertia::render("Cards", ['cards' => $cards, 'people' => $people]);
+        $people = Person::orderBy('stu_id')->orderBy('stu_id')->get();
+        return Inertia::render("Cards", [
+            'cards' => $cards, 'people' => $people
+        ]);
     }
 
     /**
@@ -53,7 +55,7 @@ class CardController extends Controller
             'status'=> $status
         ]);
 
-        return redirect()->back()->with(['card' => $card]);
+        return redirect()->back()->with('card', $card);
     }
 
     /**
@@ -76,18 +78,14 @@ class CardController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request)
+    public function update(Request $request, Card $card)
     {
         //
         $request->validate([
-            'id' =>  'required|exists:cards,id', 
             'person_id' => 'required|exists:person,id', 
             'inner_code' => 'required|max:50', 
             'status' => 'required|boolean',
         ]);
-
-        $id = $request->input('id');
-        $card = Card::where('id', '=', $id);
 
         $person_id = $request->input('person_id');
         $inner_code = $request->input('inner_code');
@@ -100,10 +98,12 @@ class CardController extends Controller
         ]);
 
         if ($res) {
-            return response()->json(['success'=> true, 'data'=> "修改成功"]);
+            return redirect()->back()->with('card', $card);
         }
         else {
-            return response()->json(['success'=> false, 'data'=> '修改失敗']);
+            return redirect()->back()->withErrors([
+                'message' => '修改失敗'
+            ]);
         }
     }
 
@@ -121,10 +121,12 @@ class CardController extends Controller
         $res = Card::where('id', '=', $id)->delete();
 
         if ($res) {
-            return response()->json(['success'=> true, 'data'=> "刪除成功"]);
+            return redirect()->back();
         }
         else {
-            return response()->json(['success'=> false, 'data'=> '刪除失敗']);
+            return redirect()->back()->withErrors([
+                'message' => '刪除失敗'
+            ]);
         }
 
     }

@@ -6,6 +6,7 @@ import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
 import { utils, writeFileXLSX } from 'xlsx';
 import { ref } from 'vue';
+import { toastErrors, toastSuccessMessage } from '../utils';
 
 const page = usePage<ChecklistPageProps>();
 const clist = ref<Checklist>();
@@ -44,22 +45,22 @@ const onCfSubmit = () => {
     if (clist.value) {
         cf.put(route('checklist.update', { checkList: clist.value.id }), {
             onSuccess: () => {
-                alert("修改成功");
+                toastSuccessMessage("手動簽到退成功");
                 onCancel();
             }, 
             onError: (err) => {
-                alert("修改失敗");
+                toastErrors(err);
             }
         });
     }
     else {
         cf.post(route('checklist.store'), {
             onSuccess: () => {
-                alert("手動簽到退成功");
+                toastSuccessMessage("手動簽到退成功");
                 onCancel();
             }, 
             onError: (err) => {
-                alert("手動簽到退失敗");
+                toastErrors(err);
             }
         });
     }
@@ -71,12 +72,13 @@ const onCfReset = () => {
 
 const onSfSubmit = () => {
     sf.get(route('checklist.index'), {
-        preserveState: true,  
+        preserveState: true, 
+        preserveUrl: true, 
         onSuccess: () => {
             onCancel();
         }, 
         onError: (err) => {
-            
+            toastErrors(err);
         }
     });
 }
@@ -86,12 +88,16 @@ const onSfReset = () => {
 }
 
 const onDelete = ($checklistId: number) => {
+    const yes = confirm("你確定要刪除這個紀錄嗎");
+    if (!yes) return;
     cf.delete(route('checklist.destroy', { 'checkList': $checklistId }), {
+        preserveScroll: true, 
         onSuccess: () => {
+            toastSuccessMessage("刪除成功");
             onCancel();
         }, 
-        onError: (err) => {
-
+        onError: (errors) => {
+            toastErrors(errors);
         }
     })
 }
