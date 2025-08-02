@@ -1,7 +1,29 @@
-# Check-System
+# 學生會人員簽到系統
 
-## 學生會人員簽到系統
-
+## 安裝步驟
+1. 將`.env.example`複製成`.env`並修改參數
+2. 安裝依賴：
+   ```bash
+   composer install
+   npm install
+   ```
+3. 執行
+   ```bash
+   php artisan key:generate #產生APP_KEY
+   php artisan migrate #執行遷移
+   ```
+4. 啟動開發伺服器：
+   ```bash
+   composer run dev
+   ```
+   伺服器預設埠號為 `http://localhost:8000`
+   
+## 建置與部署
+- 產生生產環境檔案：
+  ```bash
+  npm run build
+  ```
+  
 ### Last Update
 - Version:      1.3
 - Commit name:  Vue
