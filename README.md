@@ -24,6 +24,8 @@
   npm run build
   ```
   
+## 更新歷程
+  
 ### Last Update
 - Version:      1.3
 - Commit name:  Vue
