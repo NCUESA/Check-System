@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('authip', function (Blueprint $table) {
             $table->id();
-            $table->ipAddress();
+            $table->ipAddress()->unique();
             $table->string('description', 50)->default('');
             $table->boolean('status')->default(1);
             $table->timestamps();

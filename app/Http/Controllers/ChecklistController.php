@@ -56,7 +56,8 @@ class ChecklistController extends Controller
         }
         $checklists = $query->orderByDesc('checkin_time')->orderByDesc('checkout_time')->get();
         return Inertia::render("Checklist", [
-            'checklists' => $checklists
+            'checklists' => $checklists, 
+            'checklists_dl' => []
         ]);
     }
 

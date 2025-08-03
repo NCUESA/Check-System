@@ -27,7 +27,8 @@ class CheckList extends Model
 
     protected function casts()  {
         return [
-            
+            'checkin_operation' => 'boolean', 
+            'checkout_operation' => 'boolean'
         ];
     }
 

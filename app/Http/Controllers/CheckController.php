@@ -18,7 +18,7 @@ class CheckController extends Controller
     {
         //
         $now = Carbon::now();
-        $nowStr = $now->timezone('Asia/Taipei')->format("Y-m-d H:i");
+        $nowStr = $now->timezone('Asia/Taipei')->format("Y-m-d H:m");
 
         $clientIp= '127.0.0.1';
         if (isset($_SERVER['HTTP_CF_CONNECTING_IPV6'])) {
@@ -73,7 +73,8 @@ class CheckController extends Controller
         ->first();
         if ($checklist) {
             $checklist->load('person');
-            $checkinTime = Carbon::createFromFormat("Y-m-d H:i", $checklist->checkin_time, 'Asia/Taipei');
+            $checkinTime = Carbon::parseFromLocale($checklist->checkin_time, 'zh-TW', 'Asia/Taipei');
+
             $checkinTimeAfter2Min = $checkinTime->addMinutes(2);
             $interval = $checkinTimeAfter2Min->diff($now, false);
             $diff = $now->diffInMinutes($checkinTime);
@@ -85,7 +86,7 @@ class CheckController extends Controller
                 ->withErrors(['message' => "請等待".$interval->minutes."分".$interval->seconds."秒後再簽退"]);
             }
             $checklist->update([
-                'checkout_time' => $nowStr, 
+                'checkout_time' => $now, 
                 'checkout_operation' => 0, 
                 'checkout_ip' => $clientIp
             ]);
@@ -97,7 +98,7 @@ class CheckController extends Controller
         else {
             $checklist = CheckList::create([
                 'person_id' => $card->owner->id, 
-                'checkin_time' => $nowStr, 
+                'checkin_time' => $now, 
                 'checkin_operation' => 0, 
                 'checkin_ip' => $clientIp
             ]);

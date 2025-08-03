@@ -127,8 +127,21 @@ const onCancel = () => {
 }
 
 const downloadSheet =  () => {
+    const data = page.props.checklists.map((checklist) => ({
+        name: checklist.person?.name, 
+        checkin_time: checklist.checkin_time, 
+        checkin_operation: checklist.checkin_operation ? '自動' : '手動', 
+        checkout_time: checklist.checkout_time, 
+        checkout_operation: checklist.checkout_operation ? '自動' : '手動', 
+        checkin_ip: checklist.checkin_ip, 
+        checkout_ip: checklist.checkout_ip
+    }));
     const book = utils.book_new();
-    const sheet = utils.json_to_sheet(page.props.checklists, {});
+    const sheet = utils.json_to_sheet(data, {
+        skipHeader: true
+    });
+    const headers = [['姓名', '簽到時間', '簽到類型', '簽退時間', '簽退類型', '簽到IP', '簽退IP', '']];
+    utils.sheet_add_aoa(sheet, headers, { origin: "A1" });
     utils.book_append_sheet(book, sheet, "報表");
     const bookName = [ sf.year ?? "All", sf.month ?? "All", sf.name ? sf.name : "All", sf.sid ? sf.sid : "All", sf.checkin_loc ?? "All", sf.checkout_loc ?? "All" ].join("-") + ".xlsx";
     writeFileXLSX(book, bookName);
