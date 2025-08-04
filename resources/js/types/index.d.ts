@@ -8,7 +8,7 @@ export interface SharedData extends PageProps {
 
 export interface IndexPageProps extends SharedData {
     checklist?: Checklist, 
-    time?: string, 
+    time?: Date, 
     status?: boolean
 }
 

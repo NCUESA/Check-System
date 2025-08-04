@@ -13,12 +13,13 @@ return new class extends Migration
     {
         Schema::create('checklist', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 20);
-            $table->string('inner_code', 20);
-            $table->dateTime('checkin_time');
-            $table->boolean('checkin_operation');
-            $table->dateTime('checkout_time');
-            $table->boolean('checkout_operation');
+            $table->foreignId('person_id')->references('id')->on('person')->restrictOnDelete()->cascadeOnUpdate();
+            $table->dateTime('checkin_time')->nullable();
+            $table->boolean('checkin_operation')->default(0);
+            $table->ipAddress('checkin_ip')->default('0.0.0.0');
+            $table->dateTime('checkout_time')->nullable();
+            $table->boolean('checkout_operation')->default(0);
+            $table->ipAddress('checkout_ip')->default('0.0.0.0');
             $table->timestamps();
         });
     }
