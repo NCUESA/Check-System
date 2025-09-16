@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('cards'))
+        if (Schema::hasTable('announcements'))
             return;
-        Schema::create('cards', function (Blueprint $table) {
+        Schema::create('announcements', function (Blueprint $table) {
             $table->id();
-            $table->string('inner_code')->unique();
-            $table->foreignId('person_id')->references('id')->on('person')->cascadeOnDelete()->cascadeOnUpdate();
-            $table->boolean('status')->default(1);
+            $table->string('title', 100);
+            $table->text('content');
+            $table->boolean('on_top')->default(false);
             $table->timestamps();
         });
     }
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cards');
+        Schema::dropIfExists('announcements');
     }
 };

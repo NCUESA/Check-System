@@ -27,7 +27,9 @@ const onClick = (routeName: string) => {
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="javascript:void(0)" @click="onClick('home')">填寫值勤時間</a>
                     </li>
-                    
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="javascript:void(0)" @click="onClick('announcements.index')">值勤指南一覽</a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="javascript:void(0)" @click="onClick('checklist.index')" v-if="page.props.is_allowed">打卡清單</a>
                     </li>
@@ -54,7 +56,7 @@ const onClick = (routeName: string) => {
         </div>
     </nav>
 
-    <div class="container">
+    <div class="container p-3">
         <slot></slot>
     </div>
 </template>
