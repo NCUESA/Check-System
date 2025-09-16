@@ -11,6 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('authip'))
+            return;
         Schema::create('authip', function (Blueprint $table) {
             $table->id();
             $table->ipAddress()->unique();

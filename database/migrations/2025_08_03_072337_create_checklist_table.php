@@ -11,6 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('checklist'))
+            return;
         Schema::create('checklist', function (Blueprint $table) {
             $table->id();
             $table->foreignId('person_id')->references('id')->on('person')->restrictOnDelete()->cascadeOnUpdate();

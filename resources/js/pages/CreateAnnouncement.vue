@@ -2,10 +2,9 @@
 import Editor from '@tinymce/tinymce-vue'
 import { useForm, usePage } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
-import { toastErrorMessage, toastErrors, toastInfoMessage, toastSuccessMessage } from '../utils';
+import { toastErrorMessage, toastSuccessMessage, TINYMCE_API_KEY } from '../utils';
 import { computed } from 'vue';
 
-const apiKey = import.meta.env.VITE_TINYMCE_API_KEY
 const f = useForm<{
     title: string, 
     content: string, 
@@ -48,7 +47,7 @@ const onReset = () => {
         <div class="pb-3">
             <label class="form-label">內容</label>
             <Editor
-                :api-key="apiKey"
+                :api-key="TINYMCE_API_KEY"
                 :init="{
                     toolbar_mode: 'sliding',
                     plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',

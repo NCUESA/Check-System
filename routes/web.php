@@ -43,6 +43,7 @@ Route::middleware(['ipAuth'])->group(function () {
 */
 
 Route::put('/check', CheckController::class)->name('check');
+Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
 
 Route::middleware(['ipAuth'])->group(function () {
     // Cards
@@ -78,7 +79,6 @@ Route::middleware(['ipAuth'])->group(function () {
     });
 
     Route::group([], function () {
-        Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
         Route::get('/announcements/create', [AnnouncementController::class, 'create'])->name('announcements.create');
         Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
         Route::get('/announcements/{announcement}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');

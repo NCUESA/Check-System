@@ -4,8 +4,10 @@ import { Announcement } from '../types';
 import { computed, ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
+import { usePage } from '@inertiajs/vue3';
+import { TINYMCE_API_KEY } from '../utils';
 
-const apiKey = import.meta.env.VITE_TINYMCE_API_KEY
+const page = usePage()
 
 const props = defineProps<{
     parentId: string
@@ -42,12 +44,12 @@ const onUpdateBtnClicked = () => {
         <div :id="collapseId" class="accordion-collapse collapse" :aria-labelledby="headerId" :data-bs-parent="`#${parentId}`">
             <div class="accordion-body">
                 <Editor class="accordion-body"
-                    :api-key="apiKey"
+                    :api-key="TINYMCE_API_KEY"
                     :initial-value="props.announcement.content"
                     :init="tinyMCEConfig"
                     :readonly="true"
                 />
-                <div class="d-grid">
+                <div class="d-grid" v-if="page.props.is_allowed">
                     <button type="button" class="btn btn-warning btn-block" @click="onUpdateBtnClicked">更新指南</button>
                 </div>    
             </div>

@@ -1,7 +1,6 @@
 import { useToast } from "vue-toast-notification";
 import 'vue-toast-notification/dist/theme-bootstrap.css';
 
-
 const toast = useToast();
 
 export const toastSuccessMessage = (message: any) => {
@@ -40,3 +39,5 @@ export const toastErrors = (errors: any) => {
         toast.error(`${v[1]}`);
     });
 }
+
+export const TINYMCE_API_KEY = import.meta.env.VITE_TINYMCE_API_KEY ?? ""
