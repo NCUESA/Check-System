@@ -80,7 +80,8 @@ const onDelete = (cardId: number) => {
 </script>
 
 <template>
-    <h2 class="pb-3">卡片管理</h2>
+    <h2>卡片管理</h2>
+    <hr></hr>
     <form id='add-card' @submit.prevent="onSubmit" @reset.prevent="onReset">
         <h6 class="mb-3"><strong>請注意，此輸入並不防呆，送出前請先再三確認!!!</strong></h6>
         <div class="row g-3 align-items-center">

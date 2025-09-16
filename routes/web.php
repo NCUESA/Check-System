@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\CardController;
 use App\Http\Controllers\CheckController;
 use App\Http\Controllers\ChecklistController;
@@ -74,6 +75,15 @@ Route::middleware(['ipAuth'])->group(function () {
         Route::post('/ip', [IPController::class, 'store'])->name('ip.store');
         Route::put('/ip/{authIp}', [IPController::class, 'update'])->name('ip.update');
         Route::delete('/ip/{authIp}',[IPController::class,'destroy'])->name('ip.destroy');
+    });
+
+    Route::group([], function () {
+        Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
+        Route::get('/announcements/create', [AnnouncementController::class, 'create'])->name('announcements.create');
+        Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
+        Route::get('/announcements/{announcement}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');
+        Route::put('/announcements/{announcement}', [AnnouncementController::class, 'update'])->name('announcements.update');
+        Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');
     });
 });
 

@@ -64,3 +64,18 @@ export interface AuthIp {
 export interface IpPageProps extends SharedData {
     ips: AuthIp[]
 }
+
+export interface Announcement {
+    id: number, 
+    title: string, 
+    content: string, 
+    on_top: boolean
+}
+
+export interface AnnouncementsPageProps extends SharedData {
+    announcements: Announcement[]
+}
+
+export interface UpdateAnnouncementPageProps extends SharedData {
+    announcement?: Announcement
+}
