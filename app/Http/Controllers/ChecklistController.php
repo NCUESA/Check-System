@@ -43,13 +43,13 @@ class ChecklistController extends Controller
             $query = $query->whereMonth('checkin_time', '=', $month);
         }
         if ($checkin_at === "jinde") {
-            $query = $query->where('checkin_ip', '=', "10.21.44.148");
+            $query = $query->where('checkin_ip', '=', "10.21.51.7");
         }
         elseif ($checkin_at === "baosan") {
             $query = $query->where('checkin_ip', '=', "10.21.44.35");
         }
         if ($checkout_at === "jinde") {
-            $query = $query->where('checkout_ip', '=', "10.21.44.148");
+            $query = $query->where('checkout_ip', '=', "10.21.51.7");
         }
         elseif ($checkout_at === "baosan") {
             $query = $query->where('checkout_ip', '=', "10.21.44.35");
@@ -92,7 +92,7 @@ class ChecklistController extends Controller
         $data['checkout_operation'] = 1;
 
         if ($checkinAt === "jinde") {
-            $data['checkin_ip'] = "10.21.44.148";
+            $data['checkin_ip'] = "10.21.51.7";
         }
         elseif ($checkinAt === "baosan") {
             $data['checkin_ip'] = "10.21.44.35";
@@ -102,7 +102,7 @@ class ChecklistController extends Controller
         }
 
         if ($checkoutAt === "jinde") {
-            $data['checkout_ip'] = "10.21.44.148";
+            $data['checkout_ip'] = "10.21.51.7";
         }
         elseif ($checkoutAt === "baosan") {
             $data['checkout_ip'] = "10.21.44.35";
@@ -154,7 +154,7 @@ class ChecklistController extends Controller
         $data['checkout_operation'] = 1;
 
         if ($checkinAt === "jinde") {
-            $data['checkin_ip'] = "10.21.44.148";
+            $data['checkin_ip'] = "10.21.51.7";
         }
         elseif ($checkinAt === "baosan") {
             $data['checkin_ip'] = "10.21.44.35";
@@ -164,7 +164,7 @@ class ChecklistController extends Controller
         }
 
         if ($checkoutAt === "jinde") {
-            $data['checkout_ip'] = "10.21.44.148";
+            $data['checkout_ip'] = "10.21.51.7";
         }
         elseif ($checkoutAt === "baosan") {
             $data['checkout_ip'] = "10.21.44.35";
