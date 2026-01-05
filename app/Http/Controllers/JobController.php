@@ -23,23 +23,7 @@ class JobController extends Controller
         ]);
         $inner_code = $request->input('inner_code');
         $check_time = Carbon::parse($request->input('check_time'));
-        $clientIp= '127.0.0.1';
-        if (isset($_SERVER['HTTP_CF_CONNECTING_IPV6'])) {
-            $clientIp = $_SERVER['HTTP_CF_CONNECTING_IPV6'];
-          } elseif (isset($_SERVER['HTTP_CF_CONNECTING_IP'])) {
-            $clientIp = $_SERVER['HTTP_CF_CONNECTING_IP'];
-          } elseif (isset($_SERVER["HTTP_X_REAL_IP"])) {
-            $clientIp = $_SERVER["HTTP_X_REAL_IP"];
-          } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $clientIp = $_SERVER('HTTP_X_FORWARDED_FOR');
-            $clientIps = explode(',', $clientIp);
-            $clientIp = $clientIps[0];
-          } elseif (isset($_SERVER['HTTP_CLIENT_IP'])) {
-            $clientIp = $_SERVER['HTTP_CLIENT_IP'];
-          } else {
-            if (isset($_SERVER['REMOTE_ADDR']))
-              $clientIp = $_SERVER['REMOTE_ADDR'];
-          }
+        $clientIp= $request->ip();
 
         $check_person = Person::select('name')
             ->where('inner_code', $inner_code)
