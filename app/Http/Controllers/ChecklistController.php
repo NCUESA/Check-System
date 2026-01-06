@@ -148,9 +148,14 @@ class ChecklistController extends Controller
             return redirect()->back()->withErrors(['message' => "Person with stu_id " . $sid . " not found."]);
         }
         $data['person_id'] = $person->id;
-        $data['checkin_time'] = Carbon::parse($checkinTime)->format('Y-m-d H:i');
+        $data['checkin_time'] = Carbon::parse($checkinTime)
+                                        ->timezone(config('app.timezone'))
+                                        ->format('Y-m-d H:i');
         $data['checkin_operation'] = 1;
-        $data['checkout_time'] = Carbon::parse($checkoutTime)->format('Y-m-d H:i');
+        $data['checkout_time'] = Carbon::parse($checkoutTime)
+                                        ->timezone(config('app.timezone'))
+                                        ->format('Y-m-d H:i')
+                                        ;
         $data['checkout_operation'] = 1;
 
         if ($checkinAt === "jinde") {
