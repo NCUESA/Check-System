@@ -43,16 +43,16 @@ class ChecklistController extends Controller
             $query = $query->whereMonth('checkin_time', '=', $month);
         }
         if ($checkin_at === "jinde") {
-            $query = $query->where('checkin_ip', '=', "10.21.51.7");
+            $query = $query->whereIn('checkin_ip', ["10.21.51.7", "10.21.48.41", "120.107.148.253"]);
         }
         elseif ($checkin_at === "baosan") {
-            $query = $query->where('checkin_ip', '=', "10.21.44.35");
+            $query = $query->whereIn('checkin_ip', ["10.21.44.35", "120.107.148.248"]);
         }
         if ($checkout_at === "jinde") {
-            $query = $query->where('checkout_ip', '=', "10.21.51.7");
+            $query = $query->whereIn('checkout_ip', ["10.21.51.7", "10.21.48.41", "120.107.148.253"]);
         }
         elseif ($checkout_at === "baosan") {
-            $query = $query->where('checkout_ip', '=', "10.21.44.35");
+            $query = $query->whereIn('checkout_ip', ["10.21.44.35", "120.107.148.248"]);
         }
         $checklists = $query->orderByDesc('checkin_time')->orderByDesc('checkout_time')->get();
         return Inertia::render("Checklist", [
