@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Person;
+use App\Models\User;
 use Illuminate\Console\Command;
 
 class BackupPersonInnerCode extends Command
@@ -27,7 +27,7 @@ class BackupPersonInnerCode extends Command
     public function handle()
     {
         //
-        $people = Person::all();
+        $people = User::all();
         foreach ($people as $key => $person) {
             $person->update(['inner_code_backup' => $person->inner_code]);
         }

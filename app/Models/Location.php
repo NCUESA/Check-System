@@ -5,17 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Person extends Model
+class Location extends Model
 {
     use HasFactory;
-    protected $table = 'person';
+    protected $table = 'locations';
     protected $fillable = [
-        'name', 
-        'stu_id', 
-        'inner_code', 
-        'inner_code_backup', 
+        'name',
+        'capacity',
         'status'
     ];
+
     protected function casts(): array
     {
         return [
@@ -23,7 +22,8 @@ class Person extends Model
         ];
     }
 
-    public function cards() {
-        return $this->hasMany(Card::class, 'person_id', 'id');
+    // Relationships
+    public function calendars() {
+        return $this->hasMany(Calendar::class, 'location_id', 'id');
     }
 }

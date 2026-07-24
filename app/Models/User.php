@@ -20,6 +20,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'stu_id',
+        'status',
+        'inner_code',
+        'inner_code_backup',
     ];
 
     /**
@@ -42,6 +46,19 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'status' => 'boolean',
         ];
+    }
+
+    public function cards() {
+        return $this->hasMany(Card::class, 'user_id', 'id');
+    }
+
+    public function checklists() {
+        return $this->hasMany(CheckList::class, 'user_id', 'id');
+    }
+
+    public function calendars() {
+        return $this->hasMany(Calendar::class, 'user_id', 'id');
     }
 }

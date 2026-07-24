@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CardController;
 use App\Http\Controllers\CheckController;
 use App\Http\Controllers\ChecklistController;
@@ -19,10 +20,17 @@ Route::get('/', function () {
 })->name('home');
 
 Route::put('/check', CheckController::class)->name('check');
+
+// Keycloak SSO
+Route::group([], function () {
+    Route::get('/login/keycloak/redirect', [AuthController::class, 'redirect'])->name('login.keycloak.redirect');
+    Route::get('/login/keycloak/callback', [AuthController::class, 'callback'])->name('login.keycloak.callback');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+});
 Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
 
 // Duty
-Route::group([], function () {
+Route::middleware('auth')->group(function () {
     Route::get('/duty', [DutyController::class, 'index'])->name('duty.index');
     Route::get('/duty/phone', [DutyController::class, 'phone'])->name('duty.phone');
     Route::get('/duty/calendar', [DutyController::class, 'calendar'])->name('duty.calendar');
@@ -31,7 +39,7 @@ Route::group([], function () {
 });
 
 // Cards
-Route::group([], function () {
+Route::middleware('auth')->group(function () {
     Route::get('/cards', [CardController::class,'index'])->name('cards.index');
     Route::post('/cards', [CardController::class, 'store'])->name('cards.store');
     Route::put('/cards/{card}', [CardController::class, 'update'])->name('cards.update');
@@ -39,7 +47,7 @@ Route::group([], function () {
 });
 
 // Person
-Route::group([],function () {
+Route::middleware('auth')->group(function () {
     Route::get('/people', [PersonController::class, 'index'])->name('people.index');
     Route::post('/people', [PersonController::class, 'store'])->name('people.store');
     Route::put('/people/{person}', [PersonController::class, 'update'])->name('people.update');
@@ -47,7 +55,7 @@ Route::group([],function () {
 });
 
 // CheckList
-Route::group([],function(){
+Route::middleware('auth')->group(function () {
     Route::get('/checklist', [ChecklistController::class, 'index'])->name('checklist.index');
     Route::post('/checklist', [ChecklistController::class, 'store'])->name('checklist.store');
     Route::put('/checklist/{checkList}', [ChecklistController::class, 'update'])->name('checklist.update');
@@ -56,7 +64,7 @@ Route::group([],function(){
 
 // IP
 // Abandoned due to the fact that the IP authentication is no longer needed, and the IP management is not a priority for now.
-// Edit at 2026/07/23, Ender
+// Edit by Ender, at 2026/07/23
 // Route::group([],function(){
 //     Route::get('/ip', [IPController::class, 'index'])->name('ip.index');
 //     Route::post('/ip', [IPController::class, 'store'])->name('ip.store');

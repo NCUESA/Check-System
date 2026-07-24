@@ -10,8 +10,8 @@ class CheckList extends Model
     use HasFactory;
     protected $table = 'checklist';
     protected $fillable = [
-        'name', 
-        'person_id', 
+        'name',
+        'user_id',
         'checkin_time',
         'checkin_operation',
         'checkout_time',
@@ -21,8 +21,8 @@ class CheckList extends Model
         'inner_code_backup'
     ];
 
-    public function person() {
-        return $this->belongsTo(Person::class, 'person_id', 'id');
+    public function user() {
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     protected function casts()  {

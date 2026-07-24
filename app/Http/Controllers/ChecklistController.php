@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreChecklistRequest;
 use App\Http\Requests\UpdateChecklistRequest;
 use App\Models\CheckList;
-use App\Models\Person;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
@@ -19,7 +19,7 @@ class ChecklistController extends Controller
     public function index()
     {
         //
-        $query = CheckList::query()->with('person');
+        $query = CheckList::query()->with('user');
         $message = Session::get('message');
 
         $request = request();
@@ -31,10 +31,10 @@ class ChecklistController extends Controller
         $checkout_at = $request->query('checkout_loc');
 
         if ($name) {
-            $query = $query->whereRelation('person', 'name', '=', $name);
+            $query = $query->whereRelation('user', 'name', '=', $name);
         }
         if ($sid) {
-            $query = $query->whereRelation('person', 'stu_id', '=', $sid);
+            $query = $query->whereRelation('user', 'stu_id', '=', $sid);
         }
         if ($year) {
             $query = $query->whereYear('checkin_time', '=', $year);
@@ -81,11 +81,11 @@ class ChecklistController extends Controller
         $checkoutTime = $data['checkout_time'];
         $checkinAt = $data['checkin_at'];
         $checkoutAt = $data['checkout_at'];
-        $person = Person::where('stu_id', '=', $sid)->where('status', '=', 1)->first();
+        $person = User::where('stu_id', '=', $sid)->where('status', '=', 1)->first();
         if (!$person) {
             return redirect()->back()->withErrors(['message' => "Person with stu_id " . $sid . " not found."]);
         }
-        $data['person_id'] = $person->id;
+        $data['user_id'] = $person->id;
         $data['checkin_time'] = Carbon::parse($checkinTime)->timezone('Asia/Taipei')->format('Y-m-d H:i');
         $data['checkin_operation'] = 1;
         $data['checkout_time'] = Carbon::parse($checkoutTime)->timezone('Asia/Taipei')->format('Y-m-d H:i');
@@ -143,11 +143,11 @@ class ChecklistController extends Controller
         $checkoutTime = $data['checkout_time'];
         $checkinAt = $data['checkin_at'];
         $checkoutAt = $data['checkout_at'];
-        $person = Person::where('stu_id', '=', $sid)->where('status', '=', 1)->first();
+        $person = User::where('stu_id', '=', $sid)->where('status', '=', 1)->first();
         if (!$person) {
             return redirect()->back()->withErrors(['message' => "Person with stu_id " . $sid . " not found."]);
         }
-        $data['person_id'] = $person->id;
+        $data['user_id'] = $person->id;
         $data['checkin_time'] = Carbon::parse($checkinTime)
                                         ->timezone(config('app.timezone'))
                                         ->format('Y-m-d H:i');

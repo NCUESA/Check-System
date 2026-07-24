@@ -17,8 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'ipAuth' => AuthMiddleware::class
         ]);
-    })
-    ->withMiddleware(function (Middleware $middleware) {
+        $middleware->redirectGuestsTo(fn () => route('login.keycloak.redirect'));
         $middleware->web(append: [
             HandleInertiaRequests::class,
         ]);

@@ -1,13 +1,18 @@
 <!-- File Location: resources/js/Components/Nav.vue -->
 <script setup lang="ts">
 import { computed } from 'vue';
-import { Link, usePage } from '@inertiajs/vue3';
+import { Link, router, usePage } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
-import { useNavigation } from '../composables/useNavigation'; 
+import { useNavigation } from '../composables/useNavigation';
 
 const page = usePage();
 const { services } = useNavigation(); // 取得路由資料
 
+const user = computed(() => page.props.auth?.user ?? null);
+
+const logout = () => {
+    router.post(route('logout'));
+};
 </script>
 
 <template>
@@ -32,14 +37,16 @@ const { services } = useNavigation(); // 取得路由資料
                 </ul>
 
                 <!-- Right Side Information -->
-                <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center gap-3" v-if="user">
                     <div class="text-white text-end">
-                        <div class="fw-bold fs-6">您好，{{ page.props.auth?.user?.name || '王小明' }}</div>
+                        <div class="fw-bold fs-6">您好，{{ user.name }}</div>
                     </div>
                     <span class="badge rounded-pill" :class="page.props.is_allowed ? 'bg-success' : 'bg-secondary'">
                         {{ page.props.is_allowed ? '管理員' : '一般部員' }}
                     </span>
+                    <button class="btn btn-sm btn-outline-light" type="button" @click="logout">登出</button>
                 </div>
+                <a v-else class="btn btn-sm btn-outline-light" :href="route('login.keycloak.redirect')">登入</a>
             </div>
         </div>
     </nav>

@@ -10,8 +10,8 @@ class Card extends Model
     use HasFactory;
     protected $table = "cards";
     protected $fillable = [
-        "person_id", 
-        "inner_code", 
+        "user_id",
+        "inner_code",
         "status"
     ];
 
@@ -23,6 +23,6 @@ class Card extends Model
     }
 
     public function owner() {
-        return $this->belongsTo(Person::class, 'person_id', 'id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }

@@ -50,13 +50,13 @@ class CheckController extends Controller
             ->with('time', $nowStr)
             ->withErrors(['message' => "此卡的擁有者已被停權"]);
         }
-        $checklist = CheckList::where('person_id', '=', $card->owner->id)
+        $checklist = CheckList::where('user_id', '=', $card->owner->id)
         ->where('checkout_time', '=', null)
         ->whereNot('checkin_time', '=', null)
         ->orderByDesc('checkin_time')
         ->first();
         if ($checklist) {
-            $checklist->load('person');
+            $checklist->load('user');
             $checkinTime = Carbon::parseFromLocale($checklist->checkin_time, 'zh-TW', 'Asia/Taipei');
 
             $checkinTimeAfter2Min = $checkinTime->addMinutes(2);
@@ -81,12 +81,12 @@ class CheckController extends Controller
         }
         else {
             $checklist = CheckList::create([
-                'person_id' => $card->owner->id, 
-                'checkin_time' => $now, 
-                'checkin_operation' => 0, 
+                'user_id' => $card->owner->id,
+                'checkin_time' => $now,
+                'checkin_operation' => 0,
                 'checkin_ip' => $clientIp
             ]);
-            $checklist->load('person');
+            $checklist->load('user');
             return redirect()->back()
             ->with('checklist', $checklist)
             ->with('status', true)

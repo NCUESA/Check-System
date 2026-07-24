@@ -41,9 +41,12 @@ class HandleInertiaRequests extends Middleware
 
         $isAllowed = AuthIp::where('ip_address', $clientIp)->exists();
         return array_merge(parent::share($request), [
-            'ip' => $clientIp, 
+            'ip' => $clientIp,
             'is_allowed' => $isAllowed,
-            'message' => Session::get('message')
+            'message' => Session::get('message'),
+            'auth' => [
+                'user' => $request->user(),
+            ],
         ]);
     }
 }

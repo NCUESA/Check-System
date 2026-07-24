@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePersonRequest;
 use App\Http\Requests\UpdatePersonRequest;
-use App\Models\Person;
+use App\Models\User;
 use Inertia\Inertia;
 
 class PersonController extends Controller
@@ -15,7 +15,7 @@ class PersonController extends Controller
     public function index()
     {
         //
-        $people = Person::orderBy('stu_id')->get();
+        $people = User::orderBy('stu_id')->get();
         return Inertia::render("Person", [
             "people" => $people
         ]);
@@ -28,7 +28,7 @@ class PersonController extends Controller
     {
         //
         $data = $request->validated();
-        $person = Person::create($data);
+        $person = User::create($data);
         return redirect()->back()->with(['person' => $person]);
     }
 
@@ -43,7 +43,7 @@ class PersonController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatePersonRequest $request, Person $person)
+    public function update(UpdatePersonRequest $request, User $person)
     {
         //
         $data = $request->validated();
@@ -54,7 +54,7 @@ class PersonController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Person $person)
+    public function destroy(User $person)
     {
         //
         $person->delete();
