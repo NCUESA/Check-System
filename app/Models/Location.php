@@ -12,13 +12,17 @@ class Location extends Model
     protected $fillable = [
         'name',
         'capacity',
+        'allowance',
+        'hours',
         'status'
     ];
 
     protected function casts(): array
     {
         return [
-            'status' => 'boolean'
+            'status' => 'boolean',
+            'allowance' => 'integer',
+            'hours' => 'decimal:1'
         ];
     }
 

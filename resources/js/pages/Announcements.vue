@@ -11,8 +11,6 @@ const onCreateBtnClicked = () => {
 </script>
 
 <template>
-    <h2>值勤指南一覽</h2>
-    <hr></hr>
     <div class="d-grid pb-3">
         <button type="button" class="btn btn-primary" @click="onCreateBtnClicked" v-if="page.props.is_admin">新增值勤指南</button>
     </div>

@@ -82,8 +82,6 @@ const onDelete = (authIpId: number) => {
 </script>
 
 <template>
-    <h2>IP通過清單管理</h2>
-    <hr>
     <form id='add-ip' @submit.prevent="onSubmit" @reset.prevent="onReset">
         <h6><strong>請注意，此輸入並不防呆，送出前請先再三確認!!!</strong></h6>
         <div class="row g-3 align-items-center">

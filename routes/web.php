@@ -9,6 +9,9 @@ use App\Http\Controllers\DutyController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\IPController;
 use App\Http\Controllers\SystemController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\LocationController;
+use App\Http\Controllers\DutyCapacityController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -66,6 +69,20 @@ Route::middleware('auth')->group(function () {
 // System
 Route::middleware('auth')->group(function () {
     Route::get('/system', [SystemController::class, 'index'])->name('system.index');
+    Route::get('/system/admins', [AdminController::class, 'index'])->name('system.admins.index');
+    
+    // Location and Capacity management
+    Route::get('/system/locations', [LocationController::class, 'index'])->name('system.locations.index');
+    Route::post('/system/locations', [LocationController::class, 'store'])->name('system.locations.store');
+    Route::put('/system/locations/{location}', [LocationController::class, 'update'])->name('system.locations.update');
+    Route::put('/system/locations/{location}/ignore', [LocationController::class, 'ignore'])->name('system.locations.ignore');
+    Route::get('/system/capacity', [DutyCapacityController::class, 'index'])->name('system.capacity.index');
+
+    // Admin List
+
+
+    // Card management
+
 });
 
 // IP

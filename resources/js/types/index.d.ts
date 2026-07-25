@@ -53,16 +53,29 @@ export interface ChecklistPageProps extends SharedData {
 }
 
 export interface Card {
-    id: number, 
-    inner_code: string, 
-    person_id: number, 
-    status: boolean, 
+    id: number,
+    inner_code: string,
+    user_id: number,
+    status: boolean,
     owner?: Person
 }
 
 export interface CardPageProps extends SharedData {
     cards: Card[], 
     people?: Person[]
+}
+
+export interface Location {
+    id: number,
+    name: string,
+    capacity: number,
+    allowance: number,
+    hours: number,
+    status: boolean
+}
+
+export interface LocationPageProps extends SharedData {
+    locations: Location[]
 }
 
 export interface AuthIp {
