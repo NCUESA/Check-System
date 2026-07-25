@@ -22,6 +22,7 @@ class User extends Authenticatable
         'password',
         'stu_id',
         'status',
+        'is_admin',
         'inner_code',
         'inner_code_backup',
     ];
@@ -47,6 +48,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'status' => 'boolean',
+            'is_admin' => 'boolean',
         ];
     }
 

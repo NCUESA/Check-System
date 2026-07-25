@@ -2,20 +2,24 @@
 import { computed } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
-// 將路由引入
-import { useNavigation } from '../composables/useNavigation';
 
-const page = usePage();
+// Import the route from definition file
+// (But the definition file is not sync with Route) 
+import { useNavigation } from '../composables/useNavigation';
+import { SharedData } from '../types';
+
+const page = usePage<SharedData>();
 const { services } = useNavigation(); // 取得路由資料
+const user = computed(() => page.props.auth?.user ?? null);
 </script>
 
 <template>
     <div>
         <!-- 上半部：功能捷徑卡片區 (Grid System) -->
-        <div class="row g-4 mb-5">
-            <div 
-                class="col-12 col-sm-6 col-lg-4" 
-                v-for="service in services" 
+        <div class="row g-4 mb-5" v-if="user">
+            <div
+                class="col-12 col-sm-6 col-lg-4"
+                v-for="service in services"
                 :key="service.title"
             >
                 <Link :href="route(service.routeName)" class="text-decoration-none">
@@ -31,7 +35,9 @@ const { services } = useNavigation(); // 取得路由資料
                 </Link>
             </div>
         </div>
-
+        <div class="text-center text-muted py-5" v-else>
+            請先登入以使用系統功能
+        </div>
     </div>
 </template>
 

@@ -4,8 +4,9 @@ import { computed } from 'vue';
 import { Link, router, usePage } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import { useNavigation } from '../composables/useNavigation';
+import { SharedData } from '../types';
 
-const page = usePage();
+const page = usePage<SharedData>();
 const { services } = useNavigation(); // 取得路由資料
 
 const user = computed(() => page.props.auth?.user ?? null);
@@ -41,8 +42,8 @@ const logout = () => {
                     <div class="text-white text-end">
                         <div class="fw-bold fs-6">您好，{{ user.name }}</div>
                     </div>
-                    <span class="badge rounded-pill" :class="page.props.is_allowed ? 'bg-success' : 'bg-secondary'">
-                        {{ page.props.is_allowed ? '管理員' : '一般部員' }}
+                    <span class="badge rounded-pill" :class="page.props.is_admin ? 'bg-success' : 'bg-secondary'">
+                        {{ page.props.is_admin ? '管理員' : '一般部員' }}
                     </span>
                     <button class="btn btn-sm btn-outline-light" type="button" @click="logout">登出</button>
                 </div>

@@ -8,6 +8,7 @@ use App\Http\Controllers\ChecklistController;
 use App\Http\Controllers\DutyController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\IPController;
+use App\Http\Controllers\SystemController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -60,6 +61,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/checklist', [ChecklistController::class, 'store'])->name('checklist.store');
     Route::put('/checklist/{checkList}', [ChecklistController::class, 'update'])->name('checklist.update');
     Route::delete('/checklist/{checkList}', [ChecklistController::class, 'destroy'])->name('checklist.destroy');
+});
+
+// System
+Route::middleware('auth')->group(function () {
+    Route::get('/system', [SystemController::class, 'index'])->name('system.index');
 });
 
 // IP

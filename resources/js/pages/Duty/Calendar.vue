@@ -33,7 +33,7 @@ const fetchMonthData = async () => {
     // });
     // monthStatusData.value = response.data;
 
-    /* 👇 這裡是為了讓你看效果的假資料產生器 (Mock Data) 👇 */
+    /*  這裡是為了讓你看效果的假資料產生器 (Mock Data) 👇 */
     const mockData: any = {};
     const daysInMonth = new Date(displayYear.value, displayMonth.value + 1, 0).getDate();
     for (let d = 1; d <= daysInMonth; d++) {

@@ -11,12 +11,23 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // The `person_id` foreign key doesn't exist on every environment (it's
+        // missing on `cards` in some deployments), so only drop it when present.
+        foreach (['cards', 'checklist'] as $table) {
+            $hasPersonIdForeignKey = collect(Schema::getForeignKeys($table))
+                ->contains(fn ($foreignKey) => $foreignKey['columns'] === ['person_id']);
+
+            if ($hasPersonIdForeignKey) {
+                Schema::table($table, function (Blueprint $blueprint) {
+                    $blueprint->dropForeign(['person_id']);
+                });
+            }
+        }
+
         Schema::table('cards', function (Blueprint $table) {
-            $table->dropForeign(['person_id']);
             $table->dropColumn('person_id');
         });
         Schema::table('checklist', function (Blueprint $table) {
-            $table->dropForeign(['person_id']);
             $table->dropColumn('person_id');
         });
 

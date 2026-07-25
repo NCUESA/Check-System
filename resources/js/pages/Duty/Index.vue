@@ -48,7 +48,7 @@ const handleSwipe = () => {
                         </h1>
 
                         <div class="input-group input-group-lg w-75 mx-auto shadow-sm">
-                            <span class="input-group-text bg-white border-end-0">💳</span>
+                            
                             <input type="text" class="form-control border-start-0 focus-ring"
                                 placeholder="請將卡片靠近感應區 (嗶卡)" v-model="cardId" @keyup.enter="handleSwipe" autofocus>
                             <button class="btn btn-primary px-4" type="button" @click="handleSwipe">打卡</button>

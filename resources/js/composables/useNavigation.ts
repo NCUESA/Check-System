@@ -1,10 +1,11 @@
 // 檔案位置：resources/js/composables/useNavigation.ts
 import { computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
+import { SharedData } from '../types';
 
 export function useNavigation() {
-    const page = usePage();
-    const isAllowed = computed(() => page.props.is_allowed);
+    const page = usePage<SharedData>();
+    const isAllowed = computed(() => page.props.is_admin);
 
     const services = computed(() => [
         { 

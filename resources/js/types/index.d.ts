@@ -1,9 +1,20 @@
 import { PageProps } from '@inertiajs/core'
 
+export interface AuthUser {
+    id: number
+    name: string | null
+    stu_id: string
+    email: string | null
+    status: boolean
+}
+
 export interface SharedData extends PageProps {
-    ip: string, 
-    is_allowed: boolean, 
-    message?: string
+    ip: string,
+    is_admin: boolean,
+    message?: string,
+    auth: {
+        user: AuthUser | null
+    }
 }
 
 export interface IndexPageProps extends SharedData {
