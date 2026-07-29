@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\AuthMiddleware;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
@@ -15,7 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         //
         $middleware->alias([
-            'ipAuth' => AuthMiddleware::class
+            'ipAuth' => AuthMiddleware::class,
+            'admin' => AdminMiddleware::class
         ]);
         $middleware->redirectGuestsTo(fn () => route('login.keycloak.redirect'));
         $middleware->web(append: [

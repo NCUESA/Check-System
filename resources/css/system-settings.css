@@ -304,6 +304,8 @@
     flex-direction: column;
     gap: 12px;
 }
+/* 不設 width: 100%。放在直式的 .action-group 裡本來就會被 stretch 撐滿，
+   設了反而讓橫向 flex 容器裡的按鈕被壓縮成一個字寬、文字逐字換行 */
 .sys-container .sys-btn-primary {
     background: var(--primary);
     color: white;
@@ -313,7 +315,7 @@
     font-weight: 600;
     cursor: pointer;
     transition: background 0.2s;
-    width: 100%;
+    white-space: nowrap;
 }
 .sys-container .sys-btn-primary:hover { background: var(--primary-hover); }
 .sys-container .sys-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -326,6 +328,6 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
-    width: 100%;
+    white-space: nowrap;
 }
 .sys-container .sys-btn-ghost:hover { background: var(--border); color: var(--text-main); }

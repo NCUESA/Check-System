@@ -24,13 +24,6 @@ const features = [
         routeName: 'system.locations.index',
         color: 'text-warning'
     },
-    {
-        title: '臨時增額',
-        icon: 'bi-calendar-plus',
-        desc: '針對特定日期、地點調整臨時值勤名額',
-        routeName: 'system.capacity.index',
-        color: 'text-danger'
-    },
 ];
 </script>
 

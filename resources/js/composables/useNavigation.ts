@@ -36,13 +36,13 @@ export function useNavigation() {
             routeName: 'announcements.index', 
             color: 'text-info' 
         },
-        { 
-            title: '打卡全表管理', 
-            icon: 'bi-list-check', 
-            desc: '檢視與匯出所有打卡紀錄', 
-            routeName: 'checklist.index', 
+        {
+            title: '差勤管理',
+            icon: 'bi-list-check',
+            desc: '手動簽到退、簽到表總覽與值勤時間設定',
+            routeName: 'duty-management.index',
             color: 'text-danger',
-            requireAdmin: true 
+            requireAdmin: true
         },
         { 
             title: '系統設定', 
