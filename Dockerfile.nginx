@@ -1,0 +1,26 @@
+# syntax=docker/dockerfile:1
+#
+# nginx 獨立成一個 image，不跟 php-fpm 包在一起。
+#
+# 為什麼不用 volume 共享 public/：
+# 具名 volume 只有「第一次建立」時會從 image 填入內容，之後你更新 app image，
+# volume 裡還是舊的 JS/CSS，前後端版本會對不起來，而且很難察覺。
+# 直接把 public/ 複製進 nginx image，兩個 image 一起 build、一起推，
+# 版本天生就是同步的。
+#
+# build 的時候要指定 app image：
+#   docker build -f Dockerfile.nginx \
+#       --build-arg APP_IMAGE=image.ncuesa.org.tw/check-system:1.4 \
+#       -t image.ncuesa.org.tw/check-system-nginx:1.4 .
+
+ARG APP_IMAGE
+FROM ${APP_IMAGE} AS app
+
+FROM nginx:1.27-alpine
+
+# 只拿 public/。PHP 原始碼不需要給 nginx，它只負責靜態檔與轉發
+COPY --from=app /var/www/html/public /var/www/html/public
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80

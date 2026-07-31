@@ -1,0 +1,64 @@
+# 放到伺服器的 /srv/check/docker-compose.yml
+# 以及 /srv/check_stage/docker-compose.yml（兩份一樣，差別在旁邊的 .env）
+#
+# name 兩邊一定要不一樣，否則 Docker 會當成同一組專案互相覆蓋。
+# 正式環境用 check，測試環境改成 check_stage。
+
+name: check
+
+services:
+  # ---- nginx：對外的網頁伺服器 ----
+  web:
+    image: ${NGINX_IMAGE:?請在 .env 設定 NGINX_IMAGE}
+    container_name: ${WEB_CONTAINER:-check-web}
+    restart: unless-stopped
+
+    ports:
+      # 左邊是主機的埠，要跟 IT 講你用哪一個，他們的反向代理才接得到
+      - "${APP_PORT:-8000}:80"
+
+    networks:
+      # 只接內部網路。它只需要找得到 app，不需要碰資料庫
+      - internal
+
+    depends_on:
+      - app
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost/up || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  # ---- php-fpm：跑 Laravel ----
+  app:
+    image: ${APP_IMAGE:?請在 .env 設定 APP_IMAGE}
+    container_name: ${APP_CONTAINER:-check-app}
+    restart: unless-stopped
+
+    # Laravel 的設定全部從這裡帶入，不打包進 image
+    env_file:
+      - .env
+
+    volumes:
+      # 上傳的檔案與 log 要留在容器外，重新部署才不會不見。
+      # 用 bind mount 放在 /srv 底下，符合 IT 的規劃，也方便直接看檔案
+      - ./storage:/var/www/html/storage
+
+    networks:
+      # internal：讓 web 找得到它
+      # ncuesa：讓它找得到 /srv/mysql 的資料庫
+      - internal
+      - ncuesa
+
+    # 不開任何對外的埠。9000 只在 internal 網路上，外面連不到
+
+networks:
+  # 每個 compose 專案各自獨立，所以 check 和 check_stage 的
+  # 「app」不會撞名
+  internal:
+
+  # 三個服務共用，用來連到資料庫。這就是 IT 說的「用 domain 連結」
+  ncuesa:
+    external: true

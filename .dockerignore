@@ -1,0 +1,47 @@
+# 這些東西不要進 image。
+# 沒有這個檔案的話，.env（含 Keycloak secret、DB 密碼）會被打包進去推到 registry。
+
+.git
+.gitignore
+.gitattributes
+.github
+
+# 相依套件在 build 階段自己裝，不要從本機複製
+node_modules
+vendor
+
+# 本機的建置產物，image 內會重新產生
+public/build
+public/hot
+public/storage
+
+# 環境設定：正式環境用 compose 的 env_file 帶入
+.env
+.env.*
+!.env.example
+
+# 本機的 Laravel 快取。
+# packages.php 記錄的是本機（含 dev 套件）的清單，帶進正式 image 會讓它
+# 去載入被 --no-dev 排除掉的 Laravel\Pail 之類的類別，一啟動就爆。
+# config.php 也一樣，會用本機的設定蓋掉正式環境的環境變數。
+# entrypoint 會在容器啟動時重新產生這些檔案。
+bootstrap/cache/*.php
+
+# 本機資料與備份
+database.sqlite3
+*.sql
+storage/logs/*
+storage/framework/cache/data/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/app/public/*
+
+# 開發用
+docker-compose.yml
+tests
+phpunit.xml
+.phpunit.result.cache
+.editorconfig
+README.md
+DEPLOY.md
+deploy
