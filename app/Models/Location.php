@@ -30,4 +30,8 @@ class Location extends Model
     public function calendars() {
         return $this->hasMany(Calendar::class, 'location_id', 'id');
     }
+
+    public function ips() {
+        return $this->hasMany(LocationIp::class, 'location_id', 'id');
+    }
 }

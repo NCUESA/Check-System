@@ -13,6 +13,7 @@ use App\Http\Controllers\IPController;
 use App\Http\Controllers\SystemController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\LocationIpController;
 use App\Http\Controllers\DutyCapacityController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -40,7 +41,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/duty', [DutyController::class, 'index'])->name('duty.index');
     Route::get('/duty/phone', [DutyController::class, 'phone'])->name('duty.phone');
     Route::get('/duty/calendar', [DutyController::class, 'calendar'])->name('duty.calendar');
-    Route::post('/duty/check', [DutyController::class, 'checkInOrOut'])->name('duty.check');
+    // 手機簽到。身分取自登入者，不需要卡號
+    Route::post('/duty/check', [CheckController::class, 'phone'])->name('duty.check');
     // 一次認領／退掉多個名額（月曆可以多選日期），所以吃 slot_ids 陣列而非單一 id
     Route::post('/duty/calendar/fill', [DutyController::class, 'fill'])->name('duty.fill');
     Route::post('/duty/calendar/cancel', [DutyController::class, 'cancel'])->name('duty.cancel');
@@ -102,6 +104,12 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/system/locations', [LocationController::class, 'store'])->name('system.locations.store');
     Route::put('/system/locations/{location}', [LocationController::class, 'update'])->name('system.locations.update');
     Route::put('/system/locations/{location}/ignore', [LocationController::class, 'ignore'])->name('system.locations.ignore');
+
+    // 地點 IP 設定：打卡時用來判斷這台機器在哪個地點
+    Route::get('/system/location-ips', [LocationIpController::class, 'index'])->name('system.location-ips.index');
+    Route::post('/system/location-ips', [LocationIpController::class, 'store'])->name('system.location-ips.store');
+    Route::put('/system/location-ips/{locationIp}', [LocationIpController::class, 'update'])->name('system.location-ips.update');
+    Route::delete('/system/location-ips/{locationIp}', [LocationIpController::class, 'destroy'])->name('system.location-ips.destroy');
 });
 
 // IP

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 use App\Models\Calendar;
+use App\Models\CheckList;
 use App\Models\Location;
+use App\Models\LocationIp;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -13,15 +15,101 @@ class DutyController extends Controller
 {
     //
 
-    public function index()
+    // 嗶卡簽到。畫面上同時顯示今天所有地點的值勤清單
+    public function index(Request $request)
     {
-        //
-        return Inertia::render('Duty/Index');
+        return Inertia::render('Duty/Index', [
+            'dutyList' => $this->todayDutyList(),
+            // 這台機器所在的地點，讓現場知道自己被認成哪裡
+            'terminal' => $this->terminalInfo($request),
+        ]);
     }
-    public function phone()
+
+    // 手機簽到
+    public function phone(Request $request)
     {
-        //
-        return Inertia::render('Duty/Phone');
+        $user = $request->user();
+        $today = now()->toDateString();
+
+        $duty = Calendar::with('location')
+            ->where('user_id', $user?->id)
+            ->where('duty_date', $today)
+            ->where('status', true)
+            ->first();
+
+        $record = CheckList::where('user_id', $user?->id)
+            ->where('checkin_time', 'like', $today . '%')
+            ->orderByDesc('checkin_time')
+            ->first();
+
+        return Inertia::render('Duty/Phone', [
+            'hasDuty' => (bool) $duty,
+            'dutyLocation' => $duty?->location?->name,
+            'status' => $this->statusOf($record),
+            'lastRecordTime' => $record?->checkout_time ?? $record?->checkin_time,
+            'terminal' => $this->terminalInfo($request),
+            // 手機端目前不驗證地點，讓前端知道要不要顯示相關提示
+            'checksLocation' => (bool) config('duty.phone_check_location'),
+        ]);
+    }
+
+    // 今天所有地點的值勤清單，並帶上每個人的打卡狀態
+    private function todayDutyList(): array
+    {
+        $today = now()->toDateString();
+
+        // 先把今天的打卡紀錄撈出來，用 user_id 分組，避免在迴圈裡逐筆查
+        $records = CheckList::where('checkin_time', 'like', $today . '%')
+            ->orderBy('checkin_time')
+            ->get()
+            ->groupBy('user_id');
+
+        return Calendar::with(['user:id,name,stu_id', 'location:id,name'])
+            ->where('duty_date', $today)
+            ->where('status', true)
+            ->whereNotNull('user_id')
+            ->get()
+            ->sortBy([
+                fn ($a, $b) => $a->location_id <=> $b->location_id,
+                fn ($a, $b) => ($a->user->stu_id ?? '') <=> ($b->user->stu_id ?? ''),
+            ])
+            ->map(function ($slot) use ($records) {
+                // 同一個人同一天可能有多筆，取這個地點的那一筆
+                $record = ($records[$slot->user_id] ?? collect())
+                    ->first(fn ($r) => $r->checkin_location_id === $slot->location_id)
+                    ?? ($records[$slot->user_id] ?? collect())->first();
+
+                return [
+                    'id' => $slot->id,
+                    'stu_id' => $slot->user->stu_id,
+                    'name' => $slot->user->name,
+                    'location' => $slot->location?->name,
+                    'checkin_time' => $record?->checkin_time,
+                    'checkout_time' => $record?->checkout_time,
+                    'status' => $this->statusOf($record),
+                ];
+            })
+            ->values()
+            ->toArray();
+    }
+
+    // 未到 → 值勤中 → 簽退
+    private function statusOf(?CheckList $record): string
+    {
+        if (!$record || !$record->checkin_time) {
+            return 'absent';
+        }
+        return $record->checkout_time ? 'checked_out' : 'on_duty';
+    }
+
+    private function terminalInfo(Request $request): array
+    {
+        $location = LocationIp::resolve($request->ip());
+
+        return [
+            'ip' => $request->ip(),
+            'location' => $location?->name,
+        ];
     }
     // 值勤月曆頁面
     // 只帶出啟用中的地點，停用的地點不開放排班

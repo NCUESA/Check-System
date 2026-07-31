@@ -219,6 +219,53 @@ export interface CapacityPageProps extends SharedData {
     users: AssignableUser[]
 }
 
+// 值勤當日的打卡狀態：未到 → 值勤中 → 簽退
+export type DutyStatus = 'absent' | 'on_duty' | 'checked_out';
+
+export interface TodayDutyRow {
+    id: number,
+    stu_id: string,
+    name: string | null,
+    location: string | null,
+    checkin_time: string | null,
+    checkout_time: string | null,
+    status: DutyStatus
+}
+
+// 目前這台裝置的來源 IP 與它被認到的地點
+export interface TerminalInfo {
+    ip: string,
+    location: string | null
+}
+
+export interface DutyIndexPageProps extends SharedData {
+    dutyList: TodayDutyRow[],
+    terminal: TerminalInfo
+}
+
+export interface DutyPhonePageProps extends SharedData {
+    hasDuty: boolean,
+    dutyLocation: string | null,
+    status: DutyStatus,
+    lastRecordTime: string | null,
+    terminal: TerminalInfo,
+    checksLocation: boolean
+}
+
+export interface LocationIpRow {
+    id: number,
+    location_id: number,
+    location: string | null,
+    ip_address: string,
+    description: string | null,
+    status: boolean
+}
+
+export interface LocationIpsPageProps extends SharedData {
+    locations: { id: number, name: string, status: boolean }[],
+    ips: LocationIpRow[]
+}
+
 export interface AuthIp {
     id: number, 
     ip_address: string, 

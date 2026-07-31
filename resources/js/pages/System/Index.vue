@@ -24,6 +24,13 @@ const features = [
         routeName: 'system.locations.index',
         color: 'text-warning'
     },
+    {
+        title: '地點 IP 設定',
+        icon: 'bi-hdd-network',
+        desc: '設定各地點的打卡機 IP，用來判斷打卡位置',
+        routeName: 'system.location-ips.index',
+        color: 'text-danger'
+    },
 ];
 </script>
 
