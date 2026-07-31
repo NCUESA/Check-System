@@ -3,6 +3,7 @@ import { ref, computed, reactive } from 'vue';
 import { router, usePage } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import AlertModal from '../../components/AlertModal.vue';
+import UserPicker from '../../components/UserPicker.vue';
 import { DutyCalendarPageProps, DutySlot } from '../../types';
 import { toastErrors, toastSuccessMessage } from '../../utils';
 
@@ -126,6 +127,9 @@ const emptyCell = (): DayCell => ({
 // 顯示用：把一天的人名串起來
 const nameList = (day: DayCell) => day.assignees.map(a => a.name).join('、');
 
+// 格子只列得下三個人，點 +X 用這個看完整名單
+const viewingDate = ref<string | null>(null);
+
 const calendarDays = computed<DayCell[]>(() => {
     const year = displayYear.value;
     const month = displayMonth.value;
@@ -170,6 +174,11 @@ const calendarDays = computed<DayCell[]>(() => {
     }
     return days;
 });
+
+// 名單 Modal 正在看哪一天
+const viewingDay = computed<DayCell | null>(() =>
+    calendarDays.value.find(d => !d.empty && d.dateString === viewingDate.value) ?? null
+);
 
 // --- 4. 互動邏輯 ---
 const isSelected = (day: DayCell) =>
@@ -333,6 +342,43 @@ const handleCancel = () => {
     <!-- 引入客製化彈窗元件 -->
     <AlertModal ref="alertModal" />
 
+    <!-- 某一天的完整名單（唯讀）。格子只列得下三個人，其餘從這裡看 -->
+    <template v-if="viewingDay">
+        <div class="modal-backdrop fade show" style="z-index: 1050;"></div>
+        <div class="modal fade show d-block" tabindex="-1" style="z-index: 1055;"
+            @click.self="viewingDate = null">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content border-0 shadow-lg rounded-4">
+                    <div class="modal-header border-bottom-0 pb-2">
+                        <h5 class="modal-title fw-bold text-dark">
+                            <i class="bi bi-people-fill me-2 text-primary"></i>
+                            {{ viewingDay.dateString }} · {{ selectedLocation?.name }}
+                        </h5>
+                        <button type="button" class="btn-close" @click="viewingDate = null"></button>
+                    </div>
+                    <div class="modal-body pt-0">
+                        <ol class="roster">
+                            <li v-for="(slot, i) in viewingDay.openSlots" :key="slot.id">
+                                <span class="roster-no">{{ i + 1 }}</span>
+                                <span v-if="slot.user" class="roster-name"
+                                    :class="{ 'is-me': slot.user.id === myId }">
+                                    {{ slot.user.name }}
+                                    <span class="roster-tag" v-if="slot.user.id === myId">你</span>
+                                </span>
+                                <span v-else class="roster-empty">（尚未有人）</span>
+                            </li>
+                        </ol>
+                        <p class="text-muted small mb-0 mt-3">
+                            共 {{ viewingDay.openSlots.length }} 個名額，已排
+                            {{ viewingDay.assignees.length }} 人，尚缺
+                            {{ viewingDay.freeSlots.length }} 位
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
     <div class="row justify-content-center">
         <div class="col-12 col-xl-10">
             <div class="card shadow border-0 rounded-4 mt-4">
@@ -416,18 +462,29 @@ const handleCancel = () => {
                                             class="assignee" :class="{ 'is-me': who.isMe }">
                                             {{ who.name }}
                                         </span>
-                                        <span v-if="day.assignees.length > 3" class="assignee more">
-                                            +{{ day.assignees.length - 3 }}
-                                        </span>
+                                        <button v-if="day.assignees.length > 3" type="button"
+                                            class="assignee more" title="查看完整名單"
+                                            @click.stop="viewingDate = day.dateString!">
+                                            +{{ day.assignees.length - 3 }} 人
+                                        </button>
                                     </div>
 
                                     <!-- 狀態提示小標 -->
-                                    <span v-if="!day.isOpen" class="status-badge text-danger">不開放</span>
+                                    <span v-if="!day.isOpen" class="status-badge text-danger">未開放</span>
                                     <span v-else-if="isCancelling(day)" class="status-badge">要退掉</span>
+
+                                    <!-- 已經有人排班時，顯示缺額狀況就好，
+                                         不再蓋上「已結束」「已截止」這種狀態字 -->
+                                    <template v-else-if="day.assignees.length">
+                                        <span v-if="day.freeSlots.length" class="status-badge text-success">
+                                            尚缺 {{ day.freeSlots.length }} 位
+                                        </span>
+                                        <span v-else class="status-badge text-muted">額滿</span>
+                                    </template>
+
                                     <span v-else-if="day.isPast" class="status-badge text-muted">已結束</span>
                                     <span v-else-if="day.isLocked" class="status-badge text-muted">已截止</span>
-                                    <span v-else-if="day.isFull" class="status-badge text-muted">額滿</span>
-                                    <span v-else class="status-badge text-success">剩 {{ day.claimableSlots.length }} 位</span>
+                                    <span v-else class="status-badge text-success">尚缺 {{ day.claimableSlots.length }} 位</span>
                                 </template>
                             </div>
                         </div>
@@ -459,13 +516,9 @@ const handleCancel = () => {
                             </template>
 
                             <template v-else>
-                                <select class="form-select form-select-sm slot-select"
-                                    v-model="assignTarget[slot.id]">
-                                    <option value="">選擇人員…</option>
-                                    <option v-for="u in page.props.users" :key="u.id" :value="u.id">
-                                        {{ u.stu_id }}　{{ u.name }}
-                                    </option>
-                                </select>
+                                <UserPicker class="slot-select"
+                                    v-model="assignTarget[slot.id]"
+                                    :users="page.props.users" />
                                 <button type="button" class="btn btn-sm btn-primary"
                                     :disabled="submitting || !assignTarget[slot.id]"
                                     @click="assignSlot(slot)">
@@ -565,14 +618,74 @@ const handleCancel = () => {
     font-size: 0.7rem;
     font-weight: 600;
     line-height: 1.25;
-    color: #495057;
+    color: #212529;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 /* 自己的班標出來 */
 .assignee.is-me { color: #0d6efd; }
-.assignee.more { color: #adb5bd; font-weight: 500; }
+/* +X 是可以點的按鈕，要把 button 的預設樣式清掉 */
+.assignee.more {
+    border: none;
+    background: #f1f3f5;
+    border-radius: 999px;
+    padding: 1px 8px;
+    color: #6c757d;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.assignee.more:hover {
+    background: #0d6efd;
+    color: #fff;
+}
+
+/* 完整名單 Modal */
+.roster {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.roster li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 4px;
+    border-bottom: 1px solid #f1f3f5;
+}
+.roster li:last-child { border-bottom: none; }
+.roster-no {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #f1f3f5;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #6c757d;
+}
+.roster-name {
+    font-weight: 600;
+    color: #212529;
+}
+.roster-name.is-me { color: #0d6efd; }
+.roster-tag {
+    margin-left: 6px;
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: #e7f1ff;
+    color: #0d6efd;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+.roster-empty {
+    color: #adb5bd;
+    font-size: 0.9rem;
+}
 
 /* 日期下方的文字狀態 */
 .status-badge {
@@ -599,13 +712,17 @@ const handleCancel = () => {
     color: #e0f0ff !important;
 }
 
-/* 不開放排班 (灰色背景，刪除線) */
+/* 未開放排班 (灰色背景) */
 .calendar-cell.is-disabled {
     background-color: #f8f9fa;
     color: #adb5bd;
     cursor: not-allowed;
-    text-decoration: line-through;
     box-shadow: none;
+}
+/* 刪除線只劃在日期數字上。掛在整個格子的話，
+   狀態說明跟人名都會被一起劃掉，那些字是要讓人讀的 */
+.calendar-cell.is-disabled .date-number {
+    text-decoration: line-through;
 }
 
 /* 已經額滿的狀態 (微透明，hover 可看名字) */

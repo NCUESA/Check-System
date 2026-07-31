@@ -76,6 +76,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     // 臨時增額
     Route::get('/duty-management/capacity', [DutyCapacityController::class, 'index'])->name('duty-management.capacity');
+    Route::post('/duty-management/capacity', [DutyCapacityController::class, 'store'])->name('duty-management.capacity.store');
+    Route::put('/duty-management/capacity/{slot}', [DutyCapacityController::class, 'toggle'])->name('duty-management.capacity.toggle');
+    Route::delete('/duty-management/capacity/{slot}', [DutyCapacityController::class, 'destroy'])->name('duty-management.capacity.destroy');
 
     // 管理員把某個名額指派給某個人
     Route::post('/duty-management/assign', [DutyController::class, 'assign'])->name('duty.assign');

@@ -193,6 +193,32 @@ export interface DutyPeriodsPageProps extends SharedData {
     locations: Location[]
 }
 
+// 臨時增額頁列出的單一名額
+export interface CapacitySlot {
+    id: number,
+    status: boolean,
+    // 歸屬的值勤期間名稱，null 代表不歸屬（只有管理員能指派）
+    period: string | null,
+    locked: boolean,
+    user: { id: number, name: string | null, stu_id: string } | null
+}
+
+export interface CapacityPeriodOption {
+    id: number,
+    name: string,
+    is_open: boolean
+}
+
+export interface CapacityPageProps extends SharedData {
+    locations: Location[],
+    periods: CapacityPeriodOption[],
+    date: string,
+    locationId: number | null,
+    slots: CapacitySlot[],
+    // 就地指派用
+    users: AssignableUser[]
+}
+
 export interface AuthIp {
     id: number, 
     ip_address: string, 
