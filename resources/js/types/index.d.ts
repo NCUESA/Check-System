@@ -249,7 +249,9 @@ export interface DutyPhonePageProps extends SharedData {
     status: DutyStatus,
     lastRecordTime: string | null,
     terminal: TerminalInfo,
-    checksLocation: boolean
+    checksLocation: boolean,
+    // 來源 IP 有沒有對應到某個地點
+    locationKnown: boolean
 }
 
 export interface LocationIpRow {

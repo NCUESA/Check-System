@@ -12,14 +12,18 @@ return [
     |
     | 關閉時只確認當事人當天有值勤，不管在哪個地點、也不管從哪裡連進來。
     |
-    | 手機簽到的邏輯已經寫好，但預設關閉——手機的來源 IP 是電信業者的，
-    | 不會落在校內網段。要啟用時把 DUTY_PHONE_CHECK_LOCATION 設成 true。
+    | 手機端預設也開啟。原因是同一個人同一天可能在兩個地點都有值勤，
+    | 不認地點的話系統無法判斷這次是要簽哪一邊的班。
+    |
+    | 代價：手機用行動網路時來源 IP 是電信業者的，不會落在校內網段，
+    | 打卡會被拒絕。實務上要求接校內 Wi-Fi，並把那些網段登記到
+    | 「系統設定 → 地點 IP 設定」。真的要放寬就把這裡設成 false。
     |
     */
 
     'card_check_location' => env('DUTY_CARD_CHECK_LOCATION', true),
 
-    'phone_check_location' => env('DUTY_PHONE_CHECK_LOCATION', false),
+    'phone_check_location' => env('DUTY_PHONE_CHECK_LOCATION', true),
 
     /*
     |--------------------------------------------------------------------------

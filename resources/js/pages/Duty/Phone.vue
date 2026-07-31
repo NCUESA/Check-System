@@ -15,7 +15,15 @@ const result = computed(() => {
     return null;
 });
 
+// 認地點時，IP 對不到地點就不能打卡——跟「今天沒班」是兩回事，要分開講
+const locationBlocked = computed(() =>
+    page.props.checksLocation && !page.props.locationKnown
+);
+
 const buttonConfig = computed(() => {
+    if (locationBlocked.value) {
+        return { text: '這個位置無法打卡', color: 'btn-secondary', icon: 'bi-geo-alt-fill', disabled: true };
+    }
     // 當天沒有值勤就不給簽，後端也會擋
     if (!page.props.hasDuty) {
         return { text: '今天沒有你的值勤', color: 'btn-secondary', icon: 'bi-calendar-x', disabled: true };
@@ -64,8 +72,17 @@ const handleCheck = () => {
                             <template v-if="page.props.hasDuty">
                                 <i class="bi bi-geo-alt me-1"></i>{{ page.props.dutyLocation }}
                             </template>
+                            <template v-else-if="locationBlocked">這個網路位置未登記</template>
                             <template v-else>今天沒有排班</template>
                         </h5>
+                        <p class="text-muted small mb-0 mt-2" v-if="locationBlocked">
+                            打卡需要連上值勤地點的網路。目前的 IP（{{ page.props.terminal.ip }}）
+                            還沒有登記所屬地點，請改連該地點的 Wi-Fi，或聯絡管理員登記。
+                        </p>
+                        <p class="text-muted small mb-0 mt-2" v-else-if="!page.props.hasDuty && page.props.checksLocation">
+                            你今天在<strong>{{ page.props.terminal.location }}</strong>沒有值勤。
+                            如果你的班在別的地點，請到該地點再打卡。
+                        </p>
                     </div>
 
                     <div class="mb-5 bg-light p-3 rounded-3">

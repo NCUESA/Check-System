@@ -31,25 +31,41 @@ class DutyController extends Controller
         $user = $request->user();
         $today = now()->toDateString();
 
+        $checksLocation = (bool) config('duty.phone_check_location');
+        $location = LocationIp::resolve($request->ip());
+
+        // 認地點時只看「這個地點」的班。
+        // 不篩的話，同一天在兩個地點值勤的人會拿到隨便一筆，
+        // 打卡狀態也會抓到別的地點那筆，畫面就會顯示成已完成。
         $duty = Calendar::with('location')
             ->where('user_id', $user?->id)
             ->where('duty_date', $today)
             ->where('status', true)
+            ->when($checksLocation, fn ($query) => $query->where('location_id', $location?->id))
             ->first();
 
-        $record = CheckList::where('user_id', $user?->id)
-            ->where('checkin_time', 'like', $today . '%')
-            ->orderByDesc('checkin_time')
-            ->first();
+        $dutyLocation = $duty?->location;
+
+        // 打卡紀錄也要限定同一個地點，跟 CheckController 的判斷一致。
+        // 認地點但 IP 認不出來時完全不撈——否則會抓到別的地點那筆，
+        // 畫面上的狀態與「上次打卡時間」都會是誤導的
+        $record = ($checksLocation && !$location)
+            ? null
+            : CheckList::where('user_id', $user?->id)
+                ->where('checkin_time', 'like', $today . '%')
+                ->when($dutyLocation, fn ($query) => $query->where('checkin_location_id', $dutyLocation->id))
+                ->orderByDesc('checkin_time')
+                ->first();
 
         return Inertia::render('Duty/Phone', [
             'hasDuty' => (bool) $duty,
-            'dutyLocation' => $duty?->location?->name,
+            'dutyLocation' => $dutyLocation?->name,
             'status' => $this->statusOf($record),
             'lastRecordTime' => $record?->checkout_time ?? $record?->checkin_time,
             'terminal' => $this->terminalInfo($request),
-            // 手機端目前不驗證地點，讓前端知道要不要顯示相關提示
-            'checksLocation' => (bool) config('duty.phone_check_location'),
+            'checksLocation' => $checksLocation,
+            // IP 有沒有對應到地點。用來區分「這裡不能打卡」和「今天沒你的班」
+            'locationKnown' => (bool) $location,
         ]);
     }
 
@@ -74,10 +90,11 @@ class DutyController extends Controller
                 fn ($a, $b) => ($a->user->stu_id ?? '') <=> ($b->user->stu_id ?? ''),
             ])
             ->map(function ($slot) use ($records) {
-                // 同一個人同一天可能有多筆，取這個地點的那一筆
+                // 只認這個地點的紀錄。
+                // 不能退而取「這個人的任何一筆」，否則同一天在兩個地點值勤的人，
+                // 在其中一邊簽到會讓兩邊的狀態都變成「值勤中」
                 $record = ($records[$slot->user_id] ?? collect())
-                    ->first(fn ($r) => $r->checkin_location_id === $slot->location_id)
-                    ?? ($records[$slot->user_id] ?? collect())->first();
+                    ->first(fn ($r) => $r->checkin_location_id === $slot->location_id);
 
                 return [
                     'id' => $slot->id,

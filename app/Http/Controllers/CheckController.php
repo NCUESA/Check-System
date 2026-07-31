@@ -79,7 +79,7 @@ class CheckController extends Controller
         // 打卡地點以值勤班表為準；有認地點時兩者本來就一致
         $dutyLocation = $location ?? $duty->location;
 
-        $open = $this->openRecord($user);
+        $open = $this->openRecord($user, $dutyLocation);
         if ($open) {
             return $this->checkout($open, $now, $clientIp, $dutyLocation);
         }
@@ -116,13 +116,18 @@ class CheckController extends Controller
     }
 
     /**
-     * 還沒簽退的紀錄。有的話這次就是簽退
+     * 這個地點還沒簽退的紀錄。有的話這次就是簽退。
+     *
+     * 一定要限定地點：同一個人同一天可能在兩個地點都有值勤，
+     * 不限定的話在寶山嗶卡會找到進德那筆還開著的紀錄，
+     * 結果變成把進德簽退，而不是在寶山簽到。
      */
-    private function openRecord(User $user): ?CheckList
+    private function openRecord(User $user, ?Location $location): ?CheckList
     {
         return CheckList::where('user_id', $user->id)
             ->whereNull('checkout_time')
             ->whereNotNull('checkin_time')
+            ->when($location, fn ($query) => $query->where('checkin_location_id', $location->id))
             ->orderByDesc('checkin_time')
             ->first();
     }
