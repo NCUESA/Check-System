@@ -1,0 +1,56 @@
+# 放到伺服器的 /srv/nginx/docker-compose.yml
+#
+# 一台 nginx 同時服務正式與測試，用網域名稱（server_name）分流。
+# 用的是官方標準 image，沒有自己 build 的東西——設定檔和靜態檔
+# 都是掛進去的，改設定只要 docker compose restart，不用重推 image。
+#
+# 目錄結構：
+#   /srv/nginx/docker-compose.yml
+#   /srv/nginx/.env
+#   /srv/nginx/conf.d/00-default.conf
+#   /srv/nginx/conf.d/check.conf
+#   /srv/nginx/conf.d/check_stage.conf
+#   /srv/nginx/logs/
+
+name: nginx
+
+services:
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: nginx
+    restart: unless-stopped
+
+    ports:
+      # 左邊是主機的埠，IT 的反向代理接這裡
+      - "${NGINX_PORT:-8080}:80"
+
+    volumes:
+      - ./conf.d:/etc/nginx/conf.d:ro
+      - ./logs:/var/log/nginx
+
+      # 各環境的靜態檔。這些目錄是 app container 啟動時自己寫進去的，
+      # nginx 只讀不寫
+      - /srv/check/public:/var/www/check/public:ro
+      - /srv/check_stage/public:/var/www/check_stage/public:ro
+
+      # 使用者上傳的檔案（public/storage 那條軟連結指向的地方）。
+      # nginx 裡沒有 app 的目錄結構，所以軟連結會斷掉，
+      # 改用 location /storage/ 的 alias 直接指到這裡
+      - /srv/check/storage/app/public:/var/www/check/storage:ro
+      - /srv/check_stage/storage/app/public:/var/www/check_stage/storage:ro
+
+    networks:
+      # 靠這個網路用 container 名稱找到 check / check_stage 的 php-fpm
+      - ncuesa
+
+    healthcheck:
+      # /up 是 Laravel 內建的健康檢查路由，會實際打到 php-fpm
+      test: ["CMD-SHELL", "wget -q -O /dev/null --header='Host: ${PROD_HOST:-check.ncuesa.org.tw}' http://localhost/up || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+networks:
+  ncuesa:
+    external: true

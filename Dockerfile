@@ -129,7 +129,10 @@ RUN chmod +x /usr/local/bin/entrypoint
 
 RUN chown -R www-data:www-data storage bootstrap/cache
 
-# php-fpm 的埠，只在 docker 內部網路開放，不對外
+# 純文件用途的宣告：這個 image 裡的 php-fpm 聽在 9000。
+# EXPOSE 本身不會開任何埠，實際對外開放與否是由 docker-compose 的
+# ports: 決定，而這個服務刻意不設 ports，所以 9000 只存在於 docker
+# 內部網路。對外的 HTTP 是 /srv/nginx 那個 container（見 deploy/nginx）。
 EXPOSE 9000
 
 ENTRYPOINT ["entrypoint"]

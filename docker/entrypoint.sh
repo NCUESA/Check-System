@@ -43,6 +43,17 @@ php artisan storage:link 2>/dev/null || true
 
 chown -R www-data:www-data storage bootstrap/cache
 
+# ---- 把 public/ 同步給 nginx ----
+# nginx 是官方標準 image，裡面沒有這個專案的檔案，靜態檔要靠共用目錄給它。
+# 每次啟動都整份覆蓋，是為了避免換 image 之後舊的 JS/CSS 留在目錄裡——
+# Vite 的檔名帶 hash，舊檔留著不會被覆蓋，但 build/manifest.json 會指到新檔，
+# 混在一起很難察覺哪裡不對。
+if [ -d /var/www/html/public-shared ]; then
+    echo "[entrypoint] 同步 public/ 給 nginx…"
+    rm -rf /var/www/html/public-shared/.[!.]* /var/www/html/public-shared/* 2>/dev/null || true
+    cp -a /var/www/html/public/. /var/www/html/public-shared/
+fi
+
 # 資料庫遷移預設不自動跑。兩個環境共用同一個 image，
 # 自動跑的話很容易在不預期的時候改到正式資料。
 # 要開啟就在 .env 設 AUTO_MIGRATE=true

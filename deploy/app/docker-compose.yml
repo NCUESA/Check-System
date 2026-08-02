@@ -1,64 +1,103 @@
-# 放到伺服器的 /srv/check/docker-compose.yml
-# 以及 /srv/check_stage/docker-compose.yml（兩份一樣，差別在旁邊的 .env）
+# Laravel（php-fpm）。正式與測試共用這一份，內容完全一樣。
 #
-# name 兩邊一定要不一樣，否則 Docker 會當成同一組專案互相覆蓋。
-# 正式環境用 check，測試環境改成 check_stage。
+# 設定「不從檔案讀」，一律用環境變數注入。下面每一項都是
+# ${VAR} 的形式，Docker Compose 會照這個順序找值：
+#
+#   1. 執行 docker compose 那個 shell 的環境變數（CI/CD 走這條）
+#   2. 同目錄下的 .env 檔（手動部署走這條）
+#
+# 所以同一份檔案，GitHub Action 的 runner 和你自己 ssh 上去手動跑，
+# 行為完全一致。帶 :? 的是沒給就直接讓 compose 報錯停下來的，
+# 通常是密碼類——與其讓它用預設值悄悄跑起來，不如當場失敗。
 
-name: check
+name: ${COMPOSE_PROJECT:?請提供 COMPOSE_PROJECT，例如 check 或 check_stage}
 
 services:
-  # ---- nginx：對外的網頁伺服器 ----
-  web:
-    image: ${NGINX_IMAGE:?請在 .env 設定 NGINX_IMAGE}
-    container_name: ${WEB_CONTAINER:-check-web}
-    restart: unless-stopped
-
-    ports:
-      # 左邊是主機的埠，要跟 IT 講你用哪一個，他們的反向代理才接得到
-      - "${APP_PORT:-8000}:80"
-
-    networks:
-      # 只接內部網路。它只需要找得到 app，不需要碰資料庫
-      - internal
-
-    depends_on:
-      - app
-
-    healthcheck:
-      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost/up || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 30s
-
-  # ---- php-fpm：跑 Laravel ----
   app:
-    image: ${APP_IMAGE:?請在 .env 設定 APP_IMAGE}
-    container_name: ${APP_CONTAINER:-check-app}
+    image: ${APP_IMAGE:?請提供 APP_IMAGE}
+
+    # nginx 是用這個名字連過來的（fastcgi_pass <這個名字>:9000），
+    # 所以正式與測試一定要不一樣，而且要跟 nginx 的設定檔對得起來
+    container_name: ${APP_CONTAINER:?請提供 APP_CONTAINER}
+
     restart: unless-stopped
 
-    # Laravel 的設定全部從這裡帶入，不打包進 image
-    env_file:
-      - .env
+    environment:
+      # ---- Laravel 基本 ----
+      APP_NAME: ${APP_NAME:-學生會值勤系統}
+      APP_ENV: ${APP_ENV:-production}
+      # 加解密與 session 都靠它。正式與測試一定要用不同的兩把
+      APP_KEY: ${APP_KEY:?請提供 APP_KEY}
+      APP_DEBUG: ${APP_DEBUG:-false}
+      # 對外的實際網址。登出跳轉、寄信、產生連結都靠它
+      APP_URL: ${APP_URL:?請提供 APP_URL}
+      APP_TIMEZONE: ${APP_TIMEZONE:-Asia/Taipei}
+      APP_LOCALE: ${APP_LOCALE:-zh_TW}
+
+      # 啟動時自動跑 migration。預設關閉
+      AUTO_MIGRATE: ${AUTO_MIGRATE:-false}
+
+      # ---- 資料庫 ----
+      # DB_HOST 填 mysql container 的名稱，不是 IP
+      DB_CONNECTION: ${DB_CONNECTION:-mysql}
+      DB_HOST: ${DB_HOST:-mysql}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_DATABASE: ${DB_DATABASE:?請提供 DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME:?請提供 DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD:?請提供 DB_PASSWORD}
+
+      # ---- Session / 快取 ----
+      SESSION_DRIVER: ${SESSION_DRIVER:-database}
+      SESSION_LIFETIME: ${SESSION_LIFETIME:-120}
+      SESSION_ENCRYPT: ${SESSION_ENCRYPT:-false}
+      SESSION_PATH: ${SESSION_PATH:-/}
+      SESSION_DOMAIN: ${SESSION_DOMAIN:-null}
+      # 走 https 才能開。網站還是 http 的話要設成 false，否則登入會一直失敗
+      SESSION_SECURE_COOKIE: ${SESSION_SECURE_COOKIE:-true}
+
+      CACHE_STORE: ${CACHE_STORE:-database}
+      QUEUE_CONNECTION: ${QUEUE_CONNECTION:-database}
+
+      # 輸出到 stderr，用 docker logs 就看得到
+      LOG_CHANNEL: ${LOG_CHANNEL:-stderr}
+      LOG_LEVEL: ${LOG_LEVEL:-warning}
+
+      # ---- Keycloak SSO ----
+      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-check-system}
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET:?請提供 KEYCLOAK_CLIENT_SECRET}
+      KEYCLOAK_REDIRECT_URI: ${KEYCLOAK_REDIRECT_URI:?請提供 KEYCLOAK_REDIRECT_URI}
+      KEYCLOAK_BASE_URL: ${KEYCLOAK_BASE_URL:-https://portal.ncuesa.org.tw}
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM:-NCUESA}
+
+      # ---- 打卡 ----
+      # 用來源 IP 判斷值勤地點。同一個人同一天可能在兩個地點有班，
+      # 關掉的話系統無法判斷這次要簽哪一邊
+      DUTY_CARD_CHECK_LOCATION: ${DUTY_CARD_CHECK_LOCATION:-true}
+      DUTY_PHONE_CHECK_LOCATION: ${DUTY_PHONE_CHECK_LOCATION:-true}
+      DUTY_CHECK_INTERVAL_MINUTES: ${DUTY_CHECK_INTERVAL_MINUTES:-2}
+
+      # ---- 反向代理 ----
+      # 留空代表信任所有代理。打卡的地點判斷靠 X-Forwarded-For，
+      # 這個沒設對的話所有打卡都會被認成同一個地點
+      TRUSTED_PROXIES: ${TRUSTED_PROXIES:-}
 
     volumes:
-      # 上傳的檔案與 log 要留在容器外，重新部署才不會不見。
-      # 用 bind mount 放在 /srv 底下，符合 IT 的規劃，也方便直接看檔案
-      - ./storage:/var/www/html/storage
+      # 上傳的檔案與 log 要留在容器外，重新部署才不會不見
+      - ${STORAGE_PATH:-./storage}:/var/www/html/storage
+
+      # 給 nginx 讀的靜態檔（JS/CSS/圖）。
+      # 容器每次啟動時 entrypoint 會把 image 裡的 public/ 複製到這裡，
+      # 所以換 image 之後這份一定是新的，不會有舊 JS/CSS 殘留
+      - ${PUBLIC_PATH:-./public}:/var/www/html/public-shared
 
     networks:
-      # internal：讓 web 找得到它
-      # ncuesa：讓它找得到 /srv/mysql 的資料庫
-      - internal
-      - ncuesa
+      # 共用網路。mysql 和 nginx 都在上面，靠 container 名稱互相找
+      - shared
 
-    # 不開任何對外的埠。9000 只在 internal 網路上，外面連不到
+    # 不開任何對外的埠。php-fpm 的 9000 只在這個網路上，
+    # 主機和外網都連不到。對外的 HTTP 由 nginx 負責
 
 networks:
-  # 每個 compose 專案各自獨立，所以 check 和 check_stage 的
-  # 「app」不會撞名
-  internal:
-
-  # 三個服務共用，用來連到資料庫。這就是 IT 說的「用 domain 連結」
-  ncuesa:
+  shared:
     external: true
+    name: ${DOCKER_NETWORK:-ncuesa}
