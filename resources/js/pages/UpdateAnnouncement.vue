@@ -53,8 +53,6 @@ const onDelete = () => {
 </script>
 
 <template>
-    <h2>值勤指南管理</h2>
-    <hr></hr>
     <h3>更改值勤指南 #{{ page.props.announcement?.id }}</h3>
     <form @submit.prevent="onSubmit" @reset.prevent="onReset">
         <div class="pb-3">
