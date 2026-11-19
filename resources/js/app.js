@@ -3,6 +3,7 @@ import { createInertiaApp } from '@inertiajs/vue3'
 import { ZiggyVue } from 'ziggy-js';
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.bundle.js'
+import '../css/system-settings.css'
 import Layout from './layouts/Layout.vue'
 import VueToast from 'vue-toast-notification'
 

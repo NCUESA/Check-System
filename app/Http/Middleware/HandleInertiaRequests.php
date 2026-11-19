@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\AuthIp;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Session;
@@ -37,13 +36,13 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        $clientIp= $request->ip();
-
-        $isAllowed = AuthIp::where('ip_address', $clientIp)->exists();
         return array_merge(parent::share($request), [
-            'ip' => $clientIp, 
-            'is_allowed' => $isAllowed,
-            'message' => Session::get('message')
+            'ip' => $request->ip(),
+            'is_admin' => $request->user()?->is_admin ?? false,
+            'message' => Session::get('message'),
+            'auth' => [
+                'user' => $request->user(),
+            ],
         ]);
     }
 }

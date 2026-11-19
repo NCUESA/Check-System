@@ -1,0 +1,41 @@
+# 放到伺服器的 /srv/mysql/docker-compose.yml
+#
+# 資料庫獨立成一個服務，正式與測試環境共用這一台，
+# 但各自使用不同的 database，資料不會互相污染。
+
+name: mysql
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: unless-stopped
+
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?請在 .env 設定 MYSQL_ROOT_PASSWORD}
+      TZ: Asia/Taipei
+
+    volumes:
+      # 資料放在 /srv/mysql/data，容器砍掉重建資料還在。
+      # 用 bind mount 而不是具名 volume，符合 IT「東西放 /srv」的規劃
+      - ./data:/var/lib/mysql
+      # 只有「第一次」建立資料庫時會執行，之後改這裡不會生效
+      - ./init:/docker-entrypoint-initdb.d:ro
+
+    # 不對外開放 3306。app 走 Docker 內部網路連進來就好，
+    # 需要從外面連（例如用 TablePlus 看資料）再臨時打開
+    # ports:
+    #   - "3306:3306"
+
+    networks:
+      - ncuesa
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+networks:
+  ncuesa:
+    external: true

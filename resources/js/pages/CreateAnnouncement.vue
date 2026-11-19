@@ -36,8 +36,6 @@ const onReset = () => {
 </script>
 
 <template>
-    <h2>值勤指南管理</h2>
-    <hr></hr>
     <h3>新增值勤指南</h3>
     <form @submit.prevent="onSubmit" @reset.prevent="onReset">
         <div class="pb-3">

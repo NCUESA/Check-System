@@ -24,7 +24,7 @@ class StorePersonRequest extends FormRequest
         return [
             //
             "name" => "required|string", 
-            "stu_id" => "required|string|unique:person,stu_id", 
+            "stu_id" => "required|string|unique:users,stu_id",
             "status" => "required|boolean"
         ];
     }

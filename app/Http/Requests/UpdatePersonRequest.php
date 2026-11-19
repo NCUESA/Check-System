@@ -28,7 +28,7 @@ class UpdatePersonRequest extends FormRequest
             "stu_id" => [
                 "required", 
                 "string", 
-                Rule::unique('person', 'stu_id')->ignore($this->route('person'))
+                Rule::unique('users', 'stu_id')->ignore($this->route('person'))
             ], 
             "status" => "required|boolean"
         ];

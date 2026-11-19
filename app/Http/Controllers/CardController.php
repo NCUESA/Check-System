@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\CardCollection;
 use App\Http\Resources\CardResource;
 use App\Models\Card;
-use App\Models\Person;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -18,7 +18,7 @@ class CardController extends Controller
     {
         //
         $cards = Card::with('owner')->orderBy('inner_code')->get();
-        $people = Person::orderBy('stu_id')->orderBy('stu_id')->get();
+        $people = User::orderBy('stu_id')->orderBy('stu_id')->get();
         return Inertia::render("Cards", [
             'cards' => $cards, 'people' => $people
         ]);
@@ -40,17 +40,17 @@ class CardController extends Controller
     {
         //
         $request->validate([
-            'person_id' => 'required|exists:person,id', 
-            'inner_code' => 'required|max:50', 
+            'user_id' => 'required|exists:users,id',
+            'inner_code' => 'required|max:50',
             'status' => 'required|boolean',
         ]);
 
-        $person_id = $request->input('person_id');
+        $user_id = $request->input('user_id');
         $inner_code = $request->input('inner_code');
         $status = $request->input('status');
 
         $card = Card::create([
-            'person_id'=> $person_id,
+            'user_id'=> $user_id,
             'inner_code'=> $inner_code,
             'status'=> $status
         ]);
@@ -82,17 +82,17 @@ class CardController extends Controller
     {
         //
         $request->validate([
-            'person_id' => 'required|exists:person,id', 
-            'inner_code' => 'required|max:50', 
+            'user_id' => 'required|exists:users,id',
+            'inner_code' => 'required|max:50',
             'status' => 'required|boolean',
         ]);
 
-        $person_id = $request->input('person_id');
+        $user_id = $request->input('user_id');
         $inner_code = $request->input('inner_code');
         $status = $request->input('status');
 
         $res = $card->update([
-            'person_id'=> $person_id,
+            'user_id'=> $user_id,
             'inner_code'=> $inner_code,
             'status'=> $status
         ]);

@@ -1,0 +1,108 @@
+# 測試環境的 CI/CD。
+#
+# 流程：build image → 推到 registry → 在伺服器上換 image 重啟 → 跑 migration。
+#
+# 為什麼整條都跑在 self-hosted runner 上：
+# registry（image.ncuesa.org.tw）和伺服器都在校內網路，GitHub 提供的
+# ubuntu-latest runner 在外面，連不進來。所以 runner 要架在校內，
+# 由 IT 註冊到這個 repo。
+#
+# 設定的來源：
+#   - 密碼類（APP_KEY、DB_PASSWORD、KEYCLOAK_CLIENT_SECRET）放 GitHub
+#     Secrets，或 IT 的 secret manager 由 runner 取出來
+#   - 其他設定寫在下面的 env:，看得到、可以 code review
+#
+# 兩者都不會寫進磁碟上的 .env，也不會進 image——只在 runner 執行
+# docker compose 的那一瞬間存在於 process 的環境變數裡。
+
+name: Deploy Staging
+
+on:
+  push:
+    branches: [main]
+  # 也可以在 Actions 頁面手動觸發（例如只想重新部署，沒改程式）
+  workflow_dispatch:
+
+# 同時只跑一個部署。連續推兩次的話，前一次會被取消，
+# 避免兩個 docker compose up 打架
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: true
+
+env:
+  REGISTRY: image.ncuesa.org.tw
+  IMAGE_NAME: image.ncuesa.org.tw/check-system
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # 用 commit SHA 當版本號，這樣每次部署都對得回某一版程式碼。
+      # 只有 latest 的話出事了沒辦法退版
+      - name: 決定版本號
+        id: version
+        run: echo "tag=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: 登入 registry
+        run: |
+          echo "${{ secrets.REGISTRY_PASSWORD }}" \
+            | docker login "$REGISTRY" -u "${{ secrets.REGISTRY_USERNAME }}" --password-stdin
+
+      - name: Build
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          docker build \
+            --build-arg VITE_TINYMCE_API_KEY="${{ secrets.VITE_TINYMCE_API_KEY }}" \
+            -t "$IMAGE_NAME:$TAG" \
+            -t "$IMAGE_NAME:staging" \
+            .
+
+      - name: Push
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          docker push "$IMAGE_NAME:$TAG"
+          docker push "$IMAGE_NAME:staging"
+
+      # 這一步才是重點：所有設定都在這裡當環境變數傳進去，
+      # 伺服器上不需要有 .env 檔
+      - name: 部署
+        working-directory: /srv/check_stage
+        env:
+          APP_IMAGE: ${{ env.IMAGE_NAME }}:${{ steps.version.outputs.tag }}
+          COMPOSE_PROJECT: check_stage
+          APP_CONTAINER: check_stage
+
+          APP_ENV: staging
+          APP_DEBUG: "true"
+          APP_URL: https://stage.check.ncuesa.org.tw
+          LOG_LEVEL: debug
+
+          DB_DATABASE: sa_duty_stage
+          DB_USERNAME: check_stage
+
+          KEYCLOAK_REDIRECT_URI: https://stage.check.ncuesa.org.tw/login/keycloak/callback
+
+          # ---- 以下是密碼類 ----
+          APP_KEY: ${{ secrets.STAGE_APP_KEY }}
+          DB_PASSWORD: ${{ secrets.STAGE_DB_PASSWORD }}
+          KEYCLOAK_CLIENT_SECRET: ${{ secrets.STAGE_KEYCLOAK_CLIENT_SECRET }}
+        run: |
+          docker compose up -d --remove-orphans
+          # 等 php-fpm 起來。剛換 image 的頭幾秒 entrypoint 還在跑快取
+          for i in $(seq 1 30); do
+            docker exec check_stage php -v >/dev/null 2>&1 && break
+            sleep 2
+          done
+          docker compose exec -T app php artisan migrate --force
+
+      - name: 確認站台活著
+        run: |
+          code=$(curl -s -o /dev/null -w '%{http_code}' \
+            -H 'Host: stage.check.ncuesa.org.tw' http://localhost:8080/up)
+          echo "GET /up -> $code"
+          [ "$code" = "200" ]

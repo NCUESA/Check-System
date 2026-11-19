@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import Editor from '@tinymce/tinymce-vue'
-import { Announcement } from '../types';
+import { Announcement, SharedData } from '../types';
 import { computed, ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import { usePage } from '@inertiajs/vue3';
 import { TINYMCE_API_KEY } from '../utils';
 
-const page = usePage()
+const page = usePage<SharedData>()
 
 const props = defineProps<{
     parentId: string
@@ -49,7 +49,7 @@ const onUpdateBtnClicked = () => {
                     :init="tinyMCEConfig"
                     :readonly="true"
                 />
-                <div class="d-grid" v-if="page.props.is_allowed">
+                <div class="d-grid" v-if="page.props.is_admin">
                     <button type="button" class="btn btn-warning btn-block" @click="onUpdateBtnClicked">更新指南</button>
                 </div>    
             </div>
